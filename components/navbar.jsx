@@ -161,11 +161,15 @@ export default function ModernNavbar() {
                             <DropdownMenuItem key={item.name} asChild className="p-0">
                               <a
                                 href={item.href}
-                                className="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors
-                                  hover:bg-black/5 hover:text-black focus:bg-black/10 focus:text-black
-                                  dark:hover:bg-white/10 dark:hover:text-white dark:focus:bg-white/10 dark:focus:text-white"
+                                className="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200
+                                  hover:bg-black/5 hover:text-black hover:translate-x-1
+                                  focus:outline-none focus:ring-2 focus:ring-black/20 focus:bg-black/5 focus:text-black
+                                  active:scale-[0.98]
+                                  dark:hover:bg-white/10 dark:hover:text-white 
+                                  dark:focus:ring-white/20 dark:focus:bg-white/10 dark:focus:text-white"
                               >
-                                <item.icon className="h-4 w-4 flex-shrink-0 text-black dark:text-white" />
+                                <item.icon className="h-4 w-4 flex-shrink-0 text-black/70 transition-colors
+                                  group-hover:text-black dark:text-white/70 dark:group-hover:text-white" />
                                 <span>{item.name}</span>
                               </a>
                             </DropdownMenuItem>

@@ -1,13 +1,5 @@
-import ModernNavbar from "@/components/navbar";
+import HeroSection from "@/components/hero-section.";
 
-
-export default function Home() {
-  return (
-   <>
-
-   <h1>Hello</h1>
-
-   </>
-  );
-
+export default function Home(){
+  return <HeroSection />
 }
