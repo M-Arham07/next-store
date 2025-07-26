@@ -11,6 +11,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'oasis.opstatics.com',
         pathname: '/content/dam/oasis/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/photo-**',
       }
     ],
   },
