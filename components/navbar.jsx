@@ -12,8 +12,11 @@ import {
   HelpCircle,
   LogOut,
   Bell,
-  LayoutDashboard,
+  ShoppingBag,
+  Truck,
+  ShoppingCart,
   FolderOpen,
+  Phone,
   Users,
   BarChart3,
   Cog,
@@ -30,13 +33,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 import { useTheme } from "next-themes"
+import Link from "next/link"
 
 const navigationItems = [
-  { name: "Dashboard", href: "#", icon: LayoutDashboard, description: "Overview and metrics" },
-  { name: "Projects", href: "#", icon: FolderOpen, description: "Manage your projects" },
-  { name: "Team", href: "#", icon: Users, description: "Team collaboration" },
-  { name: "Analytics", href: "#", icon: BarChart3, description: "Data insights" },
-  { name: "Settings", href: "#", icon: Cog, description: "Account preferences" },
+  { name: "Products", href: "/products", icon: ShoppingBag, description: "All Products" },
+  { name: "Cart", href: "#", icon: ShoppingCart, description: "View Your Cart" },
+  { name: "Orders", href: "#", icon: Truck, description: "Your Orders" },
+  { name: "Contact Us", href: "#", icon: Phone, description: "Contact Our Team" },
+  { name: "Your Account", href: "#", icon: Cog, description: "Account Preferences" },
 ]
 
 const profileMenuItems = [
@@ -94,7 +98,7 @@ export default function ModernNavbar() {
                     <nav className="space-y-1.5">
                       {navigationItems.map((item) => (
                         <DropdownMenuItem key={item.name} asChild className="p-0">
-                          <a
+                          <Link
                             href={item.href}
                             className="group flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-semibold text-foreground transition-all duration-200 hover:bg-primary/10 hover:text-primary hover:shadow-md hover:scale-[1.02] focus:bg-primary/10 focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 active:scale-[0.98]"
                           >
@@ -110,7 +114,7 @@ export default function ModernNavbar() {
                               </div>
                             </div>
                             <ChevronRight className="h-4 w-4 opacity-0 transition-opacity group-hover:opacity-100" />
-                          </a>
+                          </Link>
                         </DropdownMenuItem>
                       ))}
                     </nav>
@@ -228,7 +232,7 @@ export default function ModernNavbar() {
                           priority
                         />
                       </div>
-                      <span className="text-lg font-bold tracking-tight">O2 Store</span>
+                      <span className="text-lg tracking-tight font-extrabold">O2 Store</span>
                     </div>
                   </div>
                 </SheetContent>
