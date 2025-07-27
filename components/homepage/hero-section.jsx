@@ -2,6 +2,7 @@
 
 import { motion } from "motion/react"
 import AppleStyleCarousel from "@/components/ui/custom-ui/apple-style-carousel"
+import Link from "next/link"
 // DEFAULT PROPS:
 export default function HeroSection({
    images=[
@@ -83,9 +84,11 @@ export default function HeroSection({
           }}
           className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4"
         >
-          <button className="w-60 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
+          <Link href='/products'>
+          <button className="w-60 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 cursor-pointer hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
             Explore Products
           </button>
+          </Link>
           <button className="w-60 transform rounded-lg border border-gray-300 bg-white px-6 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-100 dark:border-gray-700 dark:bg-black dark:text-white dark:hover:bg-gray-900">
             Contact Support
           </button>
