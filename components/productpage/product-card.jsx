@@ -3,7 +3,8 @@ import Image from "next/image"
 import { Plus, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export default function ProductCard({ isAvailable, rating = 4.5, oldPrice = "$45.00", image='/s24u.jpg',id }) {
+export default function ProductCard({ isAvailable=true, rating = 4.5, oldPrice = "$45.00", image='/s24u.jpg',id,name,category }) {
+  
   return (
     <div
       className={`bg-white dark:bg-black rounded-lg sm:rounded-xl 
@@ -37,10 +38,10 @@ export default function ProductCard({ isAvailable, rating = 4.5, oldPrice = "$45
           <div className="flex items-start justify-between mb-1 sm:mb-2">
             <div className="flex-1 pr-1 sm:pr-2">
               <h2 className="text-xs sm:text-sm md:text-base font-bold text-[#252b42] dark:text-white leading-tight line-clamp-2 mb-1">
-                Snickers Off-White 2024
+                {name}
               </h2>
               <p className="text-[#737373] dark:text-gray-400 text-[10px] sm:text-xs font-medium tracking-wide uppercase">
-                Electronics
+                {category}
               </p>
             </div>
             {/* Add Button */}
