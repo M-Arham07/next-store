@@ -6,22 +6,31 @@ import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import SearchInput from "@/components/homepage/search-input"
+import { useRouter } from "next/navigation";
 
-export default function ProductInfoPage() {
-  const [selectedColor, setSelectedColor] = useState("beige")
-  const [selectedSize, setSelectedSize] = useState("small")
-  const [quantity, setQuantity] = useState(5)
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
-  const [touchStart, setTouchStart] = useState(null)
-  const [touchEnd, setTouchEnd] = useState(null)
-  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
+export default function ProductInfoPage({currentProduct,addToCart}) {
+
+  const {id,title:name,isAvailable,rating,price,oldPrice,category,images:thumbnails,description}=currentProduct ?? {};
+
+
+  console.log("Curr product:",currentProduct)
+ 
+
+
+  const [selectedColor, setSelectedColor] = useState("beige");
+  const [selectedSize, setSelectedSize] = useState("small");
+  const [quantity, setQuantity] = useState(1);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   // Minimum swipe distance (in px)
-  const minSwipeDistance = 50
+  const minSwipeDistance = 50;
 
   const onTouchStart = (e) => {
-    setTouchEnd(null) // Reset touchEnd
-    setTouchStart(e.targetTouches[0].clientX)
+    setTouchEnd(null); // Reset touchEnd
+    setTouchStart(e.targetTouches[0].clientX);
   }
 
   const onTouchMove = (e) => {
@@ -52,12 +61,8 @@ export default function ProductInfoPage() {
     { name: "coral", color: "#ee6a5f" },
   ]
 
-  const thumbnails = [
-    "/s24u.jpg",
-    "/s24u3.jpg",
-    "/s24u4.jpg",
-    "/s24U2.jpg",
-  ]
+
+ 
 
   const incrementQuantity = () => setQuantity((prev) => prev + 1)
   const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1))
@@ -70,9 +75,17 @@ export default function ProductInfoPage() {
     }
   }
 
+  const router=useRouter();
   return (
     
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 lg:py-6">
+        <button 
+          onClick={() => router.back()} 
+          className="flex items-center gap-2 mb-4 text-sm text-muted-foreground hover:text-foreground hover:bg-gray-200 focus:bg-gray-200  rounded dark:hover:bg-gray-800 focus:dark:hover:bg-gray-800 transition-colors cursor-pointer"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Back
+        </button>
         
       <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 lg:gap-6">
         {/* Images Section */}
@@ -111,7 +124,7 @@ export default function ProductInfoPage() {
             >
               <Image
                 src={thumbnails[currentImageIndex] || "/placeholder.svg"}
-                alt="Embrace Sideboard"
+                alt={name}
                 fill
                 className="object-cover transition-all duration-300 group-hover:scale-[1.02]"
                 priority
@@ -156,7 +169,7 @@ export default function ProductInfoPage() {
             >
               <Image
                 src={thumbnails[currentImageIndex] || "/placeholder.svg"}
-                alt="Embrace Sideboard"
+                alt={name}
                 fill
                 className="object-cover transition-all duration-300 group-hover:scale-[1.02]"
                 priority
@@ -196,8 +209,8 @@ export default function ProductInfoPage() {
           {/* Header */}
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
-              <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Embrace Sideboard</h1>
-              <span className="text-xs font-medium bg-primary/10 text-primary px-3 py-1 rounded-full shrink-0">Smartphones</span>
+              <h1 className="text-xl sm:text-2xl font-semibold text-foreground">{name}</h1>
+              <span className="text-xs font-medium bg-primary/10 text-primary px-3 py-1 rounded-full shrink-0">{category}</span>
             </div>
             <div 
               className="cursor-pointer group w-full relative"
@@ -205,7 +218,7 @@ export default function ProductInfoPage() {
             >
               <div className={`relative ${!isDescriptionExpanded ? 'h-[40px] sm:h-[48px]' : ''} transition-all duration-300 ease-in-out overflow-hidden`}>
                 <p className="text-sm text-muted-foreground">
-                  Experience next-level mobile photography with our latest flagship featuring a 200MP camera system, 8K video, and advanced AI capabilities. Our revolutionary camera system delivers stunning detail in any light, while the 8K video recording lets you capture life's moments in cinema-quality resolution. The advanced AI enhances every shot, from portrait mode to night photography, ensuring professional-looking results every time. With a powerful 5000mAh battery and 45W super-fast charging, you'll never miss a moment. The 6.8-inch Dynamic AMOLED 2X display with adaptive 120Hz refresh rate provides an immersive viewing experience that's easy on the eyes.
+                  {description || "No description available for this product."}
                 </p>
                 {!isDescriptionExpanded && (
                   <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent"></div>
@@ -220,22 +233,30 @@ export default function ProductInfoPage() {
           {/* Price and Rating - Moved above hearts/bookmark/share */}
           <div className="space-y-3">
             <div className="flex items-baseline space-x-2">
-              <span className="text-2xl sm:text-3xl font-semibold text-foreground">$71.56</span>
-              <span className="text-muted-foreground line-through">$71.56</span>
+              <span className="text-2xl sm:text-3xl font-semibold text-foreground">{price}</span>
+              <span className="text-muted-foreground line-through">{oldPrice}</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
               <div className="flex items-center space-x-2">
                 <div className="flex">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star
-                      key={star}
-                      className={`w-4 h-4 ${
-                        star <= 4 ? "fill-yellow-400 text-yellow-400" : "text-gray-300 dark:text-gray-600"
-                      }`}
-                    />
-                  ))}
+                  {[1, 2, 3, 4, 5].map((star) => {
+                    const diff = rating - (star - 1);
+                    const fill = Math.max(0, Math.min(1, diff)) * 100;
+                    return (
+                      <div key={star} className="relative">
+                        <Star
+                          className="w-4 h-4 text-gray-300 dark:text-gray-600"
+                        />
+                        <div className="absolute inset-0 overflow-hidden" style={{ width: `${fill}%` }}>
+                          <Star
+                            className="w-4 h-4 fill-yellow-400 text-yellow-400"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                <span className="text-sm font-medium">4.8</span>
+                <span className="text-sm font-medium">{rating?.toFixed(1)}</span>
               </div>
               <span className="text-sm text-foreground underline cursor-pointer hover:no-underline">67 Reviews</span>
             </div>
@@ -336,7 +357,9 @@ export default function ProductInfoPage() {
                 +
               </Button>
             </div>
-            <Button className="flex-1 bg-foreground hover:bg-foreground/90 text-background h-12 rounded-lg font-medium">
+            <Button 
+            onClick={()=>{}}
+            className="flex-1 bg-foreground hover:bg-foreground/90 text-background h-12 rounded-lg font-medium cursor-pointer">
               <ShoppingBag className="w-5 h-5 mr-2" />
               Add To Cart
             </Button>

@@ -5,9 +5,9 @@ import ProductGrid from "@/components/productpage/product-grid";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
-const products = [
-  { id: 1, title: "iPhone 15 Pro", isAvailable: true, rating: 4.5, oldPrice: "$45.00" },
-  { id: 2, title: "Samsung Galaxy S24", isAvailable: true, rating: 4.2, oldPrice: "$52.00" },
+export const products = [
+  { id: 1, title: "iPhone 15 Pro Max", isAvailable: true, rating: 4.5, oldPrice: "$45.00",description:"Experience the new iphone!", category:"Smartphones", images:['/iphone15promax.jpeg'] },
+  { id: 2, title: "Samsung Galaxy S24 Ultra", isAvailable: true, rating: 5,price:"$1000", oldPrice: "$899",category:"Smartphones",description:"200MP Camera", images:['/s24u.jpg','/s24U2.jpg','/s24u3.jpg','/s24u4.jpg'] },
   { id: 3, title: "Google Pixel 8", isAvailable: false, rating: 4.8, oldPrice: "$48.00" },
   { id: 4, title: "OnePlus 12", isAvailable: true, rating: 4.6, oldPrice: "$55.00" },
   { id: 5, title: "Sony Xperia 5", isAvailable: true, rating: 4.3, oldPrice: "$42.00" },

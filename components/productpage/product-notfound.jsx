@@ -1,11 +1,11 @@
-"use client"
+
 
 import { Search, Package, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 
 export default function CNoProductFound({searchedItem}) {
-  const router = useRouter()
+
 
 
 
@@ -44,9 +44,11 @@ export default function CNoProductFound({searchedItem}) {
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3">
      
-        <Button onClick={() => router.push("/products")} className="flex items-center gap-2 cursor-pointer">
+      <Link href='/products'>
+        <Button  className="flex items-center gap-2 cursor-pointer">
+          
           Browse all products
-        </Button>
+        </Button></Link>
       </div>
     </div>
   )
