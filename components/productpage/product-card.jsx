@@ -1,8 +1,8 @@
-"use client"
+"use client";
 import Image from "next/image"
 import { Plus, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useEffect } from "react"
+
 
 
 export default function ProductCard({PRODUCT, addToCart}) {

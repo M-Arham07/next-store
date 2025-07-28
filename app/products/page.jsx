@@ -2,7 +2,10 @@
 import SearchInput from "@/components/homepage/search-input";
 import ProductCard from "@/components/productpage/product-card";
 import ProductGrid from "@/components/productpage/product-grid";
- const products = [
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
+
+const products = [
   { id: 1, title: "iPhone 15 Pro", isAvailable: true, rating: 4.5, oldPrice: "$45.00" },
   { id: 2, title: "Samsung Galaxy S24", isAvailable: true, rating: 4.2, oldPrice: "$52.00" },
   { id: 3, title: "Google Pixel 8", isAvailable: false, rating: 4.8, oldPrice: "$48.00" },
@@ -32,6 +35,17 @@ import ProductGrid from "@/components/productpage/product-grid";
   { id: 24, title: "Bang & Olufsen Beoplay H95", isAvailable: true, rating: 4.7, oldPrice: "$49.00" },
 ];
 
-export default function ProdutPage(){
-  return <ProductGrid PRODUCTS={products}/>
+export default function ProductPage() {
+  return (
+    <Suspense fallback={
+      <div className="w-full h-screen flex items-center justify-center">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-6 w-6 animate-spin text-black dark:text-white" />
+          <span className="text-base font-medium text-black dark:text-white">Loading products...</span>
+        </div>
+      </div>
+    }>
+      <ProductGrid PRODUCTS={products} />
+    </Suspense>
+  )
 }

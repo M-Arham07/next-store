@@ -18,6 +18,7 @@ export default function SearchInput({
         "Search cameras",
     ],
 }) {
+    
     const searchParams=useSearchParams();
     
     const [isExpanded, setIsExpanded] = useState(false)

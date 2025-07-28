@@ -10,7 +10,7 @@ export default function CNoProductFound({searchedItem}) {
 
 
   return (
-    <div className="col-span-full flex flex-col items-center justify-center -mt-10">
+    <div className="col-span-full flex flex-col items-center justify-center mt-1">
       {/* Icon Container */}
       <div className="relative mb-6">
         <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
