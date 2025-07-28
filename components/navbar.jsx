@@ -51,7 +51,7 @@ const profileMenuItems = [
   { name: "Sign Out", icon: LogOut, href: "#" },
 ]
 
-export default function ModernNavbar() {
+export default function ModernNavbar({mode}) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)

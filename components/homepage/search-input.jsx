@@ -18,12 +18,17 @@ export default function SearchInput({
         "Search cameras",
     ],
 }) {
+    const searchParams=useSearchParams();
+    
     const [isExpanded, setIsExpanded] = useState(false)
     const [mounted, setMounted] = useState(false)
     const [currentPlaceholderIndex, setCurrentPlaceholderIndex] = useState(0)
     const [displayedText, setDisplayedText] = useState("")
     const [isTyping, setIsTyping] = useState(true)
-    const [value, setValue] = useState("") // Declare value here
+    const [value, setValue] = useState(searchParams.get("name") ?? "") // Declare value here
+    // if searchParams only has a query, set value of the search box to it, else ""
+
+    // PRACTICAL USE-CASE: IF SOMEONE MANUALLY CHANGES THE URL QUERY, IT WILL REFLECT IN SEARCH BOX IF I USE THIS
 
     
       const router=useRouter();

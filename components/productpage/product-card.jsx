@@ -2,9 +2,14 @@
 import Image from "next/image"
 import { Plus, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useEffect } from "react"
 
-export default function ProductCard({ isAvailable=true, rating = 4.5, oldPrice = "$45.00", image='/s24u.jpg',id,name,category }) {
+
+export default function ProductCard({PRODUCT, addToCart}) {
+
+  const { isAvailable = true, rating = 4.5, oldPrice = "$45.00", image = '/s24u.jpg', id, title:name , category } = PRODUCT;
   
+
   return (
     <div
       className={`bg-white dark:bg-black rounded-lg sm:rounded-xl 
@@ -46,13 +51,13 @@ export default function ProductCard({ isAvailable=true, rating = 4.5, oldPrice =
             </div>
             {/* Add Button */}
             <Button
-              size="icon" onClick={()=>console.log(`Product with id ${id} added! `)}
+              size="icon" onClick={(e)=>{e.preventDefault(); addToCart(id)}}
               disabled={!isAvailable}
-              className={`w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full shadow-lg flex-shrink-0 transform transition-all duration-300 ${
-                isAvailable
-                  ? "bg-[#1a1a1a] hover:bg-[#2e2e2e] dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black hover:scale-110"
+              className={`w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full shadow-lg flex-shrink-0 transform transition-all duration-300 ${isAvailable
+                  ? "bg-[#1a1a1a] hover:bg-[#2e2e2e] dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black hover:scale-110 cursor-pointer"
                   : "bg-gray-400 dark:bg-gray-600 text-gray-600 dark:text-gray-400 cursor-not-allowed"
-              }`}
+                }`}
+
             >
               <Plus className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
             </Button>
