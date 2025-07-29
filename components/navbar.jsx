@@ -37,7 +37,7 @@ import Link from "next/link"
 
 const navigationItems = [
   { name: "Products", href: "/products", icon: ShoppingBag, description: "All Products" },
-  { name: "Cart", href: "#", icon: ShoppingCart, description: "View Your Cart" },
+  { name: "Cart", href: "/cart", icon: ShoppingCart, description: "View Your Cart" },
   { name: "Orders", href: "#", icon: Truck, description: "Your Orders" },
   { name: "Contact Us", href: "#", icon: Phone, description: "Contact Our Team" },
   { name: "Your Account", href: "#", icon: Cog, description: "Account Preferences" },

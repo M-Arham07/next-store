@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 
 export default function ProductInfoPage({currentProduct,addToCart}) {
 
-  const {id,title:name,isAvailable,rating,price,oldPrice,category,images:thumbnails,description}=currentProduct ?? {};
+  const {id,title:name,isAvailable,rating,price,oldPrice,category,images:thumbnails=['/placeholder.svg?height=80&width=80'],description}=currentProduct ?? {};
 
 
   console.log("Curr product:",currentProduct)
