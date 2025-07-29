@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import ProductCard from "./product-card";
 import ProductNotFound from "./product-notfound";
 
+
 export default function ProductGrid({ PRODUCTS }) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -38,7 +39,6 @@ export default function ProductGrid({ PRODUCTS }) {
     }, [searchParams, PRODUCTS]);
 
 
-
     return (
         <div className="w-full max-w-7xl mx-auto">
             <div className="px-2 sm:px-4 lg:px-6">
@@ -60,7 +60,6 @@ export default function ProductGrid({ PRODUCTS }) {
                                 <div className="w-full">
                                     <ProductCard 
                                         PRODUCT={product} 
-                                        addToCart={(x) => console.log("Added", x)} 
                                     />
                                 </div>
                             </Link>

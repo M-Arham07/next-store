@@ -9,16 +9,20 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import Image from "next/image";
 import Link from "next/link";
 import useCart from "@/hooks/useCart";
+import { products } from "../products/page"
 
 export default function Component() {
-    
+
     const { cartItems,
         isEmpty,
+        allSelected,
+        selectedItems,
         addItem,
         removeItem,
         updateQuantity,
         toggleItemSelection,
-        toggleSelectAll } = useCart();
+        toggleSelectAll,
+    } = useCart();
 
 
     const [promoCode, setPromoCode] = useState("");
@@ -32,12 +36,11 @@ export default function Component() {
 
 
 
-    {/* SELECTION   */}
-    const allSelected = cartItems.every((item) => item.selected)
-    const selectedItems = cartItems.filter((item) => item.selected)
 
 
-    {/* Checkout  */}
+
+    {/* Checkout  */ }
+    console.log("SELECTED ITEMS ARE:", selectedItems)
     const subtotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const deliveryFee = 4.9
     const discountPercent = promoApplied ? 20 : 0;
@@ -97,7 +100,7 @@ export default function Component() {
                             </div>
 
                             <div className="bg-card backdrop-blur-sm border rounded-2xl p-1 sm:p-2 shadow-lg mx-1 min-h-[200px]">
-                                {cartItems.length === 0 ? (
+                                {isEmpty ? (
                                     <div className="flex items-center justify-center h-48">
                                         <p className="text-muted-foreground text-lg">Your cart is empty</p>
                                     </div>
@@ -123,7 +126,7 @@ export default function Component() {
                                                         <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden bg-muted flex-shrink-0">
                                                             <Image
                                                                 src={item.image || "/placeholder.svg"}
-                                                                alt={item.name}
+                                                                alt={item.title}
                                                                 width={80}
                                                                 height={80}
                                                                 className="w-full h-full object-cover"
@@ -165,8 +168,7 @@ export default function Component() {
                                                                         <Plus className="h-3 w-3" />
                                                                     </Button>
                                                                 </div>
-
-                                                                <p className="text-base sm:text-lg font-semibold">${item.price.toFixed(2)}</p>
+                                                                <p className="text-base sm:text-lg font-semibold">{item.price.toFixed(2) }</p>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -178,7 +180,7 @@ export default function Component() {
                             </div>
 
                             {/* Mobile Promo Code Button - Only show if cart has items */}
-                            {cartItems.length > 0 && (
+                            {!isEmpty && (
                                 <div className="mt-6 mx-1">
                                     {promoApplied ? (
                                         <div className="bg-green-50 backdrop-blur-sm border border-green-200 rounded-2xl p-4 shadow-lg">
@@ -253,7 +255,7 @@ export default function Component() {
 
                         {/* Desktop Table Layout */}
                         <div className="hidden lg:block">
-                            {cartItems.length === 0 ? (
+                            {isEmpty ? (
                                 <div className="flex items-center justify-center h-64 bg-card backdrop-blur-sm border rounded-lg">
                                     <p className="text-muted-foreground text-xl">Your cart is empty</p>
                                 </div>
@@ -285,7 +287,7 @@ export default function Component() {
                                                         <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                                                             <Image
                                                                 src={item.image || "/placeholder.svg"}
-                                                                alt={item.name}
+                                                                alt={item.title}
                                                                 width={80}
                                                                 height={80}
                                                                 className="w-full h-full object-cover"
@@ -347,7 +349,7 @@ export default function Component() {
                             )}
 
                             {/* Continue Shopping - Only show when cart has items */}
-                            {cartItems.length > 0 && (
+                            {!isEmpty && (
                                 <div className="mt-8 pt-6 border-t">
                                     <Link href="/products">
                                         <Button variant="ghost" className="p-0">
@@ -367,7 +369,7 @@ export default function Component() {
                             <h2 className="hidden lg:block text-2xl font-bold mb-6">Order Summary</h2>
 
                             {/* Order Summary Card - Desktop - Only show when cart has items */}
-                            {cartItems.length > 0 && (
+                            {!isEmpty && (
                                 <div className="hidden lg:block bg-card backdrop-blur-sm border rounded-2xl p-4 sm:p-6 shadow-lg">
                                     {/* Items Summary */}
                                     <div className="flex justify-between items-center mb-6 pb-4 border-b">
@@ -462,7 +464,7 @@ export default function Component() {
             </div>
 
             {/* Mobile Sticky Checkout Section - Only show if cart has items */}
-            {cartItems.length > 0 && (
+            {!isEmpty && (
                 <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-background/95 backdrop-blur-md border-t p-4 pb-8 shadow-lg">
                     <div className="max-w-7xl mx-auto">
                         {/* Order Summary Details */}

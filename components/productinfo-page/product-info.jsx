@@ -233,8 +233,8 @@ export default function ProductInfoPage({currentProduct,addToCart}) {
           {/* Price and Rating - Moved above hearts/bookmark/share */}
           <div className="space-y-3">
             <div className="flex items-baseline space-x-2">
-              <span className="text-2xl sm:text-3xl font-semibold text-foreground">{price}</span>
-              <span className="text-muted-foreground line-through">{oldPrice}</span>
+              <span className="text-2xl sm:text-3xl font-semibold text-foreground">${price}</span>
+              <span className="text-muted-foreground line-through">${oldPrice}</span>
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
               <div className="flex items-center space-x-2">
