@@ -125,7 +125,7 @@ export default function ModernNavbar({mode}) {
 
             {/* Mobile Sidebar */}
             <div className="md:hidden">
-              <Sheet>
+              <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
                 <SheetTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-9 w-9 font-medium">
                     <Menu className="h-5 w-5" />
@@ -163,8 +163,9 @@ export default function ModernNavbar({mode}) {
                         <DropdownMenuContent className="w-full mt-2 bg-white text-black dark:bg-black dark:text-white border border-black/10 dark:border-white/20 shadow-xl">
                           {profileMenuItems.map((item) => (
                             <DropdownMenuItem key={item.name} asChild className="p-0">
-                              <a
+                              <Link
                                 href={item.href}
+                                onClick={() => setSidebarOpen(false)}
                                 className="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200
                                   hover:bg-black/5 hover:text-black hover:translate-x-1
                                   focus:outline-none focus:ring-2 focus:ring-black/20 focus:bg-black/5 focus:text-black
@@ -175,7 +176,7 @@ export default function ModernNavbar({mode}) {
                                 <item.icon className="h-4 w-4 flex-shrink-0 text-black/70 transition-colors
                                   group-hover:text-black dark:text-white/70 dark:group-hover:text-white" />
                                 <span>{item.name}</span>
-                              </a>
+                              </Link>
                             </DropdownMenuItem>
                           ))}
                         </DropdownMenuContent>
@@ -190,9 +191,10 @@ export default function ModernNavbar({mode}) {
 
                     <nav className="space-y-3">
                       {navigationItems.map((item, index) => (
-                        <a
+                        <Link
                           key={item.name}
                           href={item.href}
+                          onClick={() => setSidebarOpen(false)}
                           className="group flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-300 mb-8
                             bg-white text-black dark:bg-black dark:text-white
                             hover:bg-black/5 hover:text-black dark:hover:bg-white/10 dark:hover:text-white
@@ -217,7 +219,7 @@ export default function ModernNavbar({mode}) {
                             <div className="h-1.5 w-1.5 rounded-full bg-black/10 dark:bg-white/20 transition-colors group-hover:bg-black dark:group-hover:bg-white" />
                             <ChevronRight className="h-4 w-4 opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-1 text-black dark:text-white" />
                           </div>
-                        </a>
+                        </Link>
                       ))}
                     </nav>
                     {/* Branding moved to bottom */}
@@ -242,7 +244,7 @@ export default function ModernNavbar({mode}) {
 
           {/* Center: Brand */}
           <div className="flex items-center flex-1 justify-center">
-            <a href="#" className="flex items-center space-x-3 transition-transform duration-200 hover:scale-105">
+            <Link href="#" className="flex items-center space-x-3 transition-transform duration-200 hover:scale-105">
               <div className="relative h-9 w-9 rounded-xl overflow-hidden ring-2 ring-primary/20">
                 <Image
                   src="/brand.png"
@@ -257,7 +259,7 @@ export default function ModernNavbar({mode}) {
               <span className="hidden text-xl font-bold tracking-tight sm:inline-block">O2 Store</span>
               {/* Mobile brand title */}
               <span className="ml-0 text-lg font-bold tracking-tight md:hidden">O2 Store</span>
-            </a>
+            </Link>
           </div>
 
           {/* Right: Theme Toggle & Profile */}
@@ -307,13 +309,13 @@ export default function ModernNavbar({mode}) {
                   <DropdownMenuSeparator className="bg-border/50" />
                   {profileMenuItems.map((item) => (
                     <DropdownMenuItem key={item.name} asChild className="p-0">
-                      <a
+                      <Link
                         href={item.href}
                         className="flex items-center space-x-3 px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-accent/80 hover:text-accent-foreground hover:translate-x-1 focus:bg-accent focus:text-accent-foreground"
                       >
                         <item.icon className="h-4 w-4 flex-shrink-0" />
                         <span>{item.name}</span>
-                      </a>
+                      </Link>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
