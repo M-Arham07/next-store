@@ -1,177 +1,152 @@
+"use client"
 
-import ValidateProducts from "@/lib/ValidateProducts";
-import ValidateProduct from "@/lib/ValidateProducts";
-import { type } from "os";
-import { useState, useEffect } from "react";
-
-
-
-/**
- * USAGE:
- * const {addItem,removeItem,cartItems,isEmpty}=useCart();
- * 
- * addItem(currentProduct) --> adds product to cart, updates state and saves in localstorage
- * 
- * removeItem(currentProduct) --> removes product from cart, updates state and saves in localstorage
- * 
- * cartItems --> Shows all the current items in the cart!
- * 
- * isEmpty --> Tells whether the cart is empty or not
- * 
- *  
- * 
- */
-
-
-
-
-
-
-
+import ValidateProducts from "@/lib/ValidateProducts"
+import { useState, useEffect } from "react"
 
 export default function useCart() {
+  const [cartItems, setCartItems] = useState([])
+  const [isInitialized, setIsInitialized] = useState(false)
+  const [promoCode, setPromoCode] = useState("")
+  const [promoApplied, setPromoApplied] = useState(false)
+  const [promoError, setPromoError] = useState("")
+  const [promoDialogOpen, setPromoDialogOpen] = useState(false)
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false)
 
+  useEffect(() => {
+    try {
+      const rawCart = localStorage.getItem("cart")
+      if (rawCart) {
+        const cart = JSON.parse(rawCart)
+        const isOK = ValidateProducts(cart)
+        if (!isOK) throw new Error("Invalid Cart")
+        setCartItems(cart)
+      } else {
+        setCartItems([])
+      }
 
+      // Load promo state from localStorage
+      const savedPromoCode = localStorage.getItem("promoCode")
+      const savedPromoApplied = localStorage.getItem("promoApplied")
 
-    const [cartItems, setCartItems] = useState([]);
-    const [isInitialized, setIsInitialized] = useState(false);
+      if (savedPromoCode) {
+        setPromoCode(savedPromoCode)
+      }
 
-
-
-    // HOW THIS WORKS:
-
-    /* FIRST, cart is retrieved from localStorag
-     * If its null or undefined or some error occurs, initialize it with an empty array []
-     * If it exists, validate if it isnt tampered and then setCartItems to JSON.parse(cart) to update the state and show
-       the items on screen.
-     * After the first useEffect has run, it will setIsInitialized to true,
-       indicating that the cart has been intialized!
-     
-     ** 2ND useEffect:
-     * The 2nd useEffect runs on mount,when cartItems change or when isInitialized state is changed
-     * The action by the 2nd useEffect only takes place when isInitialized is true
-     * So the 2nd useEffect only runs when the cart has been initialized
-     * This prevents infinite loops and prevents emptying the cart on every reload
-     * In the second useEffect, if the cart has been initialized, and cartItems have been changed,
-       it will update the cart in the localStorage
-    */
-
-
-    /**!!!!IMPORTANT!!!!**/
-    /* We need to wrap our app in a CartContext provider, because if we use the useCart hook 
-       directly, it will create a new instance in every component!, so make sure to make a context 
-       provider for Cart and wrap your root layout in it so state is shared! */
-
-    // ||| DO NOT DIRECTLY CONSUME THIS HOOK! ONLY CONSUME THIS THROUGH THE CONTEXT ||| \\
-
-
-
-    useEffect(() => {
-
-        try {
-            const rawCart = localStorage.getItem("cart");
-
-            
-            if(rawCart){
-                const cart=JSON.parse(rawCart);
-                const isOK = ValidateProducts(cart);
-                if(!isOK) throw new Error("Invalid Cart");
-                setCartItems(cart);
-            }
-
-            else{
-                setCartItems([]);
-            }
-
-            
-
-        
-
-        }
-        catch (err) {
-            console.log("I aint a vibe coder dont oversmart me lol");
-            setCartItems([]);
-        }
-
-        setIsInitialized(true);
-
-
-    }, []);
-
-    useEffect(() => {
-        if (isInitialized) {
-            localStorage.setItem("cart", JSON.stringify(cartItems));
-        }
-
-    }, [cartItems, isInitialized]);
-
-
-
-
-    const addItem = (currentProduct) => {
-        // check if the added item already exists in cart, if it does increase its quantity by one
-        // .some returns a boolean if required thing exists, .find returns the whole array that matches the condition
-        const isExist = cartItems.some((product) => currentProduct.id === product.id);
-        if (!isExist) {
-            setCartItems((prev) => [...prev, { ...currentProduct, quantity: 1, selected: true }]);
-
-        }
-        else {
-            updateQuantity(currentProduct.id, 1)
-        }
+      if (savedPromoApplied === "true") {
+        setPromoApplied(true)
+      }
+    } catch (err) {
+      console.log("Error initializing cart from localStorage:", err)
+      setCartItems([])
     }
+    setIsInitialized(true)
+  }, [])
 
-    const removeItem = (currentProduct) => {
-        // we will need to put CartItems in dependency array of useEffect, as CartItems isnt accessible right after state update!
-
-        // filter and keep only those products whose id IS NOT EQUAL TO currentProduct's id
-        setCartItems((prev) => prev.filter((product) => product.id !== currentProduct.id))
-  
-    };
-
-
-
-
-    // these ones from AI, so idk lol
-
-    const toggleSelectAll = () => {
-        setCartItems((items) => items.map((item) => ({ ...item, selected: !allSelected })))
+  useEffect(() => {
+    if (isInitialized) {
+      localStorage.setItem("cart", JSON.stringify(cartItems))
+      // Save promo state to localStorage
+      localStorage.setItem("promoCode", promoCode)
+      localStorage.setItem("promoApplied", promoApplied.toString())
     }
+  }, [cartItems, promoCode, promoApplied, isInitialized])
 
-
-    const toggleItemSelection = (id) => {
-        setCartItems((items) => items.map((item) => (item.id === id ? { ...item, selected: !item.selected } : item)))
+  const addItem = (currentProduct) => {
+    const isExist = cartItems.some((product) => currentProduct.id === product.id)
+    if (!isExist) {
+      setCartItems((prev) => [...prev, { ...currentProduct, quantity: 1, selected: true }])
+    } else {
+      updateQuantity(currentProduct.id, 1)
     }
+  }
 
-    // Here change is +1 or -1, +1 means increase and -1 means decrease quantity
+  const removeItem = (currentProduct) => {
+    setCartItems((prev) => prev.filter((product) => product.id !== currentProduct.id))
+  }
 
-    const updateQuantity = (id, change) => {
-        setCartItems((items) =>
-            items.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, item.quantity + change) } : item)),
-        )
-    }
+  const toggleSelectAll = () => {
+    setCartItems((items) => items.map((item) => ({ ...item, selected: !allSelected })))
+  }
 
-    {/* SELECTION   */ }
-    const allSelected = cartItems.every((item) => item.selected)
-    const selectedItems = cartItems.filter((item) => item.selected)
+  const toggleItemSelection = (id) => {
+    setCartItems((items) => items.map((item) => (item.id === id ? { ...item, selected: !item.selected } : item)))
+  }
 
+  const updateQuantity = (id, change) => {
+    setCartItems((items) =>
+      items.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, item.quantity + change) } : item)),
+    )
+  }
 
-    // check if cart isEmpty
-    const isEmpty = cartItems?.length === 0;
+  const clearCart = () => {
+    setCartItems([])
+    setPromoCode("")
+    setPromoApplied(false)
+    localStorage.removeItem("cart")
+    localStorage.removeItem("promoCode")
+    localStorage.removeItem("promoApplied")
+  }
 
+  const allSelected = cartItems.every((item) => item.selected)
+  const selectedItems = cartItems.filter((item) => item.selected)
+  const isEmpty = cartItems?.length === 0
 
+  const applyPromoCode = () => {
+    setIsApplyingPromo(true)
+    setPromoError("")
 
-    return {
-        cartItems,
-        isEmpty,
-        addItem,
-        removeItem,
-        updateQuantity,
-        toggleItemSelection,
-        toggleSelectAll,
-        allSelected,
-        selectedItems
-    }
+    setTimeout(() => {
+      if (promoCode.toLowerCase() === "yellowchick") {
+        setPromoApplied(true)
+        setPromoDialogOpen(false)
+        setPromoError("")
+      } else {
+        setPromoError("Invalid promo code. Please try again.")
+      }
+      setIsApplyingPromo(false)
+    }, 2000)
+  }
 
+  const removePromoCode = () => {
+    console.log("PROMOCODE WAS ", promoCode)
+    setPromoCode("")
+    setPromoApplied(false)
+    setPromoError("")
+  }
+
+  const subtotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const deliveryFee = 4.9
+  const discountPercent = promoApplied ? 20 : 0
+  const discount = subtotal * (discountPercent / 100)
+  const total = subtotal + deliveryFee - discount
+
+  return {
+    cartItems,
+    isEmpty,
+    addItem,
+    removeItem,
+    updateQuantity,
+    toggleItemSelection,
+    toggleSelectAll,
+    allSelected,
+    selectedItems,
+    subtotal,
+    deliveryFee,
+    discountPercent,
+    discount,
+    total,
+    promoApplied,
+    promoCode,
+    promoError,
+    applyPromoCode,
+    setPromoCode,
+    setPromoApplied,
+    removePromoCode,
+    setPromoError,
+    setIsApplyingPromo,
+    isApplyingPromo,
+    promoDialogOpen,
+    setPromoDialogOpen,
+    clearCart, // Expose clearCart
+  }
 }
-

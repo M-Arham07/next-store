@@ -1,4 +1,6 @@
+import CheckoutPage from "@/components/checkout-page/checkout";
 
-export default function CHECKOUT(){
-    return <h1>HELLO WORLD</h1>
+
+export default function Checkout(){
+  return <CheckoutPage />
 }

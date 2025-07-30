@@ -23,16 +23,22 @@ export default function CartPage() {
         toggleItemSelection,
         toggleSelectAll,
         allSelected,
-        selectedItems
+        selectedItems,
+        subtotal,
+        deliveryFee,
+        discountPercent,
+        removePromoCode,
+        discount,
+        total,
+        promoApplied,
+        promoCode,
+        promoError,applyPromoCode,setPromoCode,setPromoApplied,setPromoError,
+        setIsApplyingPromo,isApplyingPromo,promoDialogOpen,setPromoDialogOpen
     } = useContext(CartContext);
 
 
-    const [promoCode, setPromoCode] = useState("");
-    const [promoApplied, setPromoApplied] = useState(false);
-    const [appliedPromoCode, setAppliedPromoCode] = useState("");
-    const [promoDialogOpen, setPromoDialogOpen] = useState(false);
-    const [promoError, setPromoError] = useState("");
-    const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+   
+
 
 
 
@@ -42,37 +48,10 @@ export default function CartPage() {
 
 
     {/* Checkout  */ }
-    const subtotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const deliveryFee = 4.9
-    const discountPercent = promoApplied ? 20 : 0;
-    const discount = subtotal * (discountPercent / 100);
-    const total = subtotal + deliveryFee - discount
 
 
-    const applyPromoCode = () => {
-        setIsApplyingPromo(true)
-        setPromoError("")
 
-        // Simulate API call with timeout
-        setTimeout(() => {
-            if (promoCode.toLowerCase() === "yellowchick") {
-                setPromoApplied(true)
-                setAppliedPromoCode(promoCode)
-                setPromoDialogOpen(false)
-                setPromoCode("")
-                setPromoError("")
-            } else {
-                setPromoError("Invalid promo code. Please try again.")
-            }
-            setIsApplyingPromo(false)
-        }, 2000)
-    }
-
-    const removePromoCode = () => {
-        setPromoApplied(false)
-        setAppliedPromoCode("")
-        setPromoError("")
-    }
+   
 
     return (
         <div className="min-h-screen bg-background">
