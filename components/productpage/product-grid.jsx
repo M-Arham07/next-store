@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import ProductCard from "./product-card";
 import ProductNotFound from "./product-notfound";
+import useNotification from "@/hooks/useNotification";
+import AlertNotification from "../AlertNotification";
 
 
 export default function ProductGrid({ PRODUCTS }) {
@@ -12,6 +14,7 @@ export default function ProductGrid({ PRODUCTS }) {
     const searchParams = useSearchParams();
     const [filteredProducts, setFilteredProducts] = useState(PRODUCTS);
     const [isLoading, setIsLoading] = useState(false);
+    const {showNotification,notify} =useNotification(3000);
 
     useEffect(() => {
         setIsLoading(true);
@@ -57,15 +60,24 @@ export default function ProductGrid({ PRODUCTS }) {
                                 href={`${product?.isAvailable ? `/products/${product.id}` : ''}`} 
                                 key={product.id}
                             >
+                                {/*  USING PROP DRILLING TO PASS NOTIFY FUNCTION TO ADD BUTTON */}
                                 <div className="w-full">
                                     <ProductCard 
-                                        PRODUCT={product} 
+                                        PRODUCT={product}
+                                        notifyFunction={()=>notify()} 
                                     />
                                 </div>
                             </Link>
                         ))
                     )}
                 </div>
+                 {showNotification && (
+                        <AlertNotification 
+                         message="Product added to Cart"
+                         linkName="View Cart"
+                         linkHref="/cart"
+                        />
+                      )}
             </div>
         </div>
     )

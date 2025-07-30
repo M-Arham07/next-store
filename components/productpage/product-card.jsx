@@ -6,7 +6,7 @@ import AddtoCartButton from "./add-button";
 
 
 
-export default function ProductCard({PRODUCT}) {
+export default function ProductCard({PRODUCT,notifyFunction}) {
 
  
   
@@ -54,7 +54,7 @@ export default function ProductCard({PRODUCT}) {
               </p>
             </div>
             {/* Add Button */}
-            <AddtoCartButton currentProduct={PRODUCT}/>
+            <AddtoCartButton currentProduct={PRODUCT} notifyFunction={notifyFunction}/>
            
           </div>
           {/* Price Section */}

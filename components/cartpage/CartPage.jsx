@@ -287,7 +287,7 @@ export default function CartPage() {
                                                         />
                                                         <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                                                             <Image
-                                                                src={(item?.images && item.images[0])  || "/placeholder.svg"}
+                                                                src={(item?.images && item.images[0]) || "/placeholder.svg"}
                                                                 alt={item.title}
                                                                 width={80}
                                                                 height={80}
@@ -367,7 +367,7 @@ export default function CartPage() {
                     <div className="mt-6 lg:mt-0 lg:col-span-1">
                         <div className="lg:sticky lg:top-8">
                             {/* Desktop Header */}
-                           { !isEmpty && (<h2 className="hidden lg:block text-2xl font-bold mb-6">Order Summary</h2>) }
+                            {!isEmpty && (<h2 className="hidden lg:block text-2xl font-bold mb-6">Order Summary</h2>)}
 
                             {/* Order Summary Card - Desktop - Only show when cart has items */}
                             {!isEmpty && (
@@ -456,7 +456,9 @@ export default function CartPage() {
                                         </div>
                                     </div>
 
-                                    <Button className="w-full py-4 text-lg font-semibold">CHECKOUT</Button>
+                                    <Link href="/checkout">
+                                        <Button className="w-full py-4 text-lg font-bold">Checkout</Button>
+                                    </Link>
                                 </div>
                             )}
                         </div>
@@ -492,7 +494,9 @@ export default function CartPage() {
                             <span className="text-2xl font-bold">${total.toFixed(2)}</span>
                         </div>
 
-                        <Button className="w-full py-4 text-lg font-semibold">CHECKOUT</Button>
+                        <Link href="/checkout">
+                            <Button className="w-full py-4 text-lg font-bold">Checkout</Button>
+                        </Link>
                     </div>
                 </div>
             )}

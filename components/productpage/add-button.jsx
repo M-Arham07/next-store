@@ -8,13 +8,15 @@
 import { Button } from "@/components/ui/button";
 import { CartContext } from "@/contexts/CartProvider";
 import useCart from "@/hooks/useCart";
+import useNotification from "@/hooks/useNotification";
 import { Plus } from "lucide-react";
 import { useContext } from "react";
 
 
 
 
-export default function AddtoCartButton({ currentProduct }) {
+
+export default function AddtoCartButton({ currentProduct,notifyFunction }) {
 
     const {
         cartItems,
@@ -28,6 +30,7 @@ export default function AddtoCartButton({ currentProduct }) {
         selectedItems
     } = useContext(CartContext);
 
+ 
     const isAvailable = currentProduct?.isAvailable
 
     return (
@@ -36,7 +39,7 @@ export default function AddtoCartButton({ currentProduct }) {
         // Prevent default is done because the whole product card is a link to product info page
         // Prevent default prevents going to product info page when add button is clicked
         <Button
-            size="icon" onClick={(e) => { e.preventDefault(); addItem(currentProduct); console.log("Added ", currentProduct) }}
+            size="icon" onClick={(e) => { e.preventDefault(); addItem(currentProduct); notifyFunction(); }}
             disabled={!isAvailable}
             className={`w-6 h-6 sm:w-8 sm:h-8 md:w-9 md:h-9 rounded-full shadow-lg flex-shrink-0 transform transition-all duration-300 ${isAvailable
                 ? "bg-[#1a1a1a] hover:bg-[#2e2e2e] dark:bg-white dark:hover:bg-gray-200 text-white dark:text-black hover:scale-110 cursor-pointer"
@@ -44,8 +47,10 @@ export default function AddtoCartButton({ currentProduct }) {
                 }`}
 
         >
+           
             <Plus className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
         </Button>
+        
 
     );
 }

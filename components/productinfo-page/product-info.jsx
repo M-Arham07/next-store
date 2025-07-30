@@ -1,29 +1,34 @@
 "use client"
-import { useState } from "react"
+import { useState, useContext } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight, Heart, Bookmark, Share2, Star, ShoppingBag, Truck, RotateCcw, Search } from "lucide-react"
+import useNotification from "@/hooks/useNotification"
+import AlertNotification from "@/components/AlertNotification"
 import { Button } from "@/components/ui/button"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import SearchInput from "@/components/homepage/search-input"
 import { useRouter } from "next/navigation";
+import { CartContext } from "@/contexts/CartProvider";
 
-export default function ProductInfoPage({currentProduct,addToCart}) {
+export default function ProductInfoPage({currentProduct}) {
+
+  const {addItem}=useContext(CartContext);
+
 
   const {id,title:name,isAvailable,rating,price,oldPrice,category,images:thumbnails=['/placeholder.svg?height=80&width=80'],description}=currentProduct ?? {};
 
 
-  console.log("Curr product:",currentProduct)
  
 
 
   const [selectedColor, setSelectedColor] = useState("beige");
   const [selectedSize, setSelectedSize] = useState("small");
-  const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const { showNotification, notify } = useNotification(3000);
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;
@@ -64,8 +69,7 @@ export default function ProductInfoPage({currentProduct,addToCart}) {
 
  
 
-  const incrementQuantity = () => setQuantity((prev) => prev + 1)
-  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1))
+
 
   const navigateImage = (direction) => {
     if (direction === "prev") {
@@ -279,7 +283,7 @@ export default function ProductInfoPage({currentProduct,addToCart}) {
             <Button variant="ghost" size="sm">
               <Bookmark className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={()=>alert("Work In Progress")}>
               <Share2 className="w-4 h-4" />
             </Button>
           </div>
@@ -335,35 +339,27 @@ export default function ProductInfoPage({currentProduct,addToCart}) {
             </RadioGroup>
           </div>*/}
 
-          {/* Quantity and Add to Cart */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-            <div className="flex items-center border border-border rounded-lg w-fit bg-background">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted"
-                onClick={decrementQuantity}
-                disabled={quantity <= 1}
-              >
-                -
-              </Button>
-              <span className="px-4 py-2 text-foreground font-medium min-w-[3rem] text-center">{quantity}</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 text-muted-foreground hover:text-foreground hover:bg-muted"
-                onClick={incrementQuantity}
-              >
-                +
-              </Button>
-            </div>
+          {/* Add to Cart */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center">
             <Button 
-            onClick={()=>{}}
-            className="flex-1 bg-foreground hover:bg-foreground/90 text-background h-12 rounded-lg font-medium cursor-pointer">
+            onClick={() => {
+              addItem(currentProduct);
+              notify();
+            }}
+            className="w-full bg-foreground hover:bg-foreground/90 text-background h-12 rounded-lg font-medium cursor-pointer">
               <ShoppingBag className="w-5 h-5 mr-2" />
               Add To Cart
             </Button>
           </div>
+
+          {/* Alert Notification */}
+          {showNotification && (
+            <AlertNotification 
+             message="Product added to Cart"
+             linkName="View Cart"
+             linkHref="/cart"
+            />
+          )}
 
           {/* Delivery Information */}
           <div className="space-y-4 pt-4 border-t border-border">
