@@ -20,8 +20,9 @@ import {
   Users,
   BarChart3,
   Cog,
-  ChevronRight,
+  ChevronRight
 } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -33,7 +34,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet"
 import { useTheme } from "next-themes"
-import Link from "next/link"
+import Link from "next/link";
+import { useSession,signOut } from "next-auth/react"
 
 const navigationItems = [
   { name: "Products", href: "/products", icon: ShoppingBag, description: "All Products" },
@@ -51,18 +53,47 @@ const profileMenuItems = [
   { name: "Sign Out", icon: LogOut, href: "#" },
 ]
 
-export default function ModernNavbar({mode}) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [profileMenuOpen, setProfileMenuOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const { theme, setTheme } = useTheme()
+
+export default function ModernNavbar() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const {data:session,status}= useSession();
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  if (!mounted) {
-    return null
+  if (!mounted || status === 'loading') {
+     return (
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-lg supports-[backdrop-filter]:bg-background/80 font-sans">
+      <div className="flex h-16 items-center justify-center relative px-4 md:px-6">
+        {/* Left: Hamburger Menu */}
+        <div className="absolute left-4 md:left-6 flex items-center">
+          <Skeleton className="h-9 w-9 rounded-md" />
+        </div>
+
+        {/* Center: Brand */}
+        <div className="flex items-center flex-1 justify-center">
+          <div className="flex items-center space-x-3">
+            <div className="relative h-9 w-9 rounded-xl overflow-hidden ring-2 ring-primary/20">
+              <Image src="/brand.png" alt="O2 Store Logo" width={36} height={36} className="object-cover" priority />
+            </div>
+            <span className="hidden text-xl font-bold tracking-tight sm:inline-block">O2 Store</span>
+            <span className="ml-0 text-lg font-bold tracking-tight md:hidden">O2 Store</span>
+          </div>
+        </div>
+
+        {/* Right: Theme Toggle & Profile */}
+        <div className="absolute right-4 md:right-6 flex items-center space-x-3">
+          <Skeleton className="h-9 w-9 rounded-md" />
+          <div className="hidden md:block">
+            <Skeleton className="h-9 w-9 rounded-full" />
+          </div>
+        </div>
+      </div>
+    </nav>
+  )
   }
 
   return (
@@ -143,46 +174,71 @@ export default function ModernNavbar({mode}) {
                   <div className="mt-6 px-6">
                     {/* Account Section with Dropdown - Black/White Theme */}
                     <div className="mb-4">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                      {session ? (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="flex items-center justify-start space-x-3 my-8 mb-2 h-12 w-full focus:outline-none rounded-lg
+                              bg-white text-black dark:bg-black dark:text-white">
+                              <div className="relative h-12 w-12 rounded-full overflow-hidden flex-shrink-0">
+                                <Avatar className="h-12 w-12">
+                                  <AvatarImage src={session?.user?.image || "/placeholder.svg?height=48&width=48"} alt="Profile" />
+                                  <AvatarFallback className="font-medium">{session?.user?.name?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                                </Avatar>
+                              </div>
+                              <div className="flex-1 min-w-0 text-left">
+                                <span className="block text-base font-bold leading-none">{session?.user?.name || 'Guest'}</span>
+                                <span className="block text-xs text-black/70 dark:text-white/70 truncate">{session?.user?.email || 'Not signed in'}</span>
+                              </div>
+                              <ChevronRight className="h-5 w-5 text-black/60 dark:text-white/70" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent className="w-full mt-2 bg-white text-black dark:bg-black dark:text-white border border-black/10 dark:border-white/20 shadow-xl">
+                            {profileMenuItems.map((item) => (
+                              <DropdownMenuItem key={item.name} asChild className="p-0">
+                                <Link
+                                  href={item.href}
+                                  onClick={(e) => {
+                                    if (item.name === "Sign Out") {
+                                      e.preventDefault();
+                                      signOut();
+                                    }
+                                    setSidebarOpen(false);
+                                  }}
+                                  className="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200
+                                    hover:bg-black/5 hover:text-black hover:translate-x-1
+                                    focus:outline-none focus:ring-2 focus:ring-black/20 focus:bg-black/5 focus:text-black
+                                    active:scale-[0.98]
+                                    dark:hover:bg-white/10 dark:hover:text-white 
+                                    dark:focus:ring-white/20 dark:focus:bg-white/10 dark:focus:text-white"
+                                >
+                                  <item.icon className="h-4 w-4 flex-shrink-0 text-black/70 transition-colors
+                                    group-hover:text-black dark:text-white/70 dark:group-hover:text-white" />
+                                  <span>{item.name}</span>
+                                </Link>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      ) : (
+                        <Link href="/login" onClick={() => setSidebarOpen(false)}>
                           <button className="flex items-center justify-start space-x-3 my-8 mb-2 h-12 w-full focus:outline-none rounded-lg
                             bg-white text-black dark:bg-black dark:text-white">
                             <div className="relative h-12 w-12 rounded-full overflow-hidden flex-shrink-0">
                               <Avatar className="h-12 w-12">
                                 <AvatarImage src="/placeholder.svg?height=48&width=48" alt="Profile" />
-                                <AvatarFallback className="font-medium">JD</AvatarFallback>
+                                <AvatarFallback className="font-medium">?</AvatarFallback>
                               </Avatar>
                             </div>
                             <div className="flex-1 min-w-0 text-left">
-                              <span className="block text-base font-bold leading-none">John Doe</span>
-                              <span className="block text-xs text-black/70 dark:text-white/70 truncate">john@example.com</span>
+                              <span className="block text-base font-bold leading-none">Sign In</span>
+                              <span className="block text-xs text-black/70 dark:text-white/70 truncate">Click to login</span>
                             </div>
                             <ChevronRight className="h-5 w-5 text-black/60 dark:text-white/70" />
                           </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-full mt-2 bg-white text-black dark:bg-black dark:text-white border border-black/10 dark:border-white/20 shadow-xl">
-                          {profileMenuItems.map((item) => (
-                            <DropdownMenuItem key={item.name} asChild className="p-0">
-                              <Link
-                                href={item.href}
-                                onClick={() => setSidebarOpen(false)}
-                                className="flex items-center space-x-3 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200
-                                  hover:bg-black/5 hover:text-black hover:translate-x-1
-                                  focus:outline-none focus:ring-2 focus:ring-black/20 focus:bg-black/5 focus:text-black
-                                  active:scale-[0.98]
-                                  dark:hover:bg-white/10 dark:hover:text-white 
-                                  dark:focus:ring-white/20 dark:focus:bg-white/10 dark:focus:text-white"
-                              >
-                                <item.icon className="h-4 w-4 flex-shrink-0 text-black/70 transition-colors
-                                  group-hover:text-black dark:text-white/70 dark:group-hover:text-white" />
-                                <span>{item.name}</span>
-                              </Link>
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                        </Link>
+                      )}
                     </div>
-
+                        
 
                     <div className="mb-10">
                       {/* Removed navigation title and description */}
@@ -277,49 +333,69 @@ export default function ModernNavbar({mode}) {
 
             {/* Desktop Profile with Hover + Focus Menu */}
             <div className="hidden md:block">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+              {session ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="relative h-9 w-9 rounded-full p-0 transition-all duration-200 hover:ring-2 hover:ring-primary/20 hover:ring-offset-2 focus:ring-2 focus:ring-primary/20 focus:ring-offset-2"
+                    >
+                      <Avatar className="h-8 w-8 transition-transform duration-200 hover:scale-110">
+                        <AvatarImage src={session.user?.image || "/placeholder.svg?height=32&width=32"} alt="Profile" />
+                        <AvatarFallback className="font-medium">{session.user?.name?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-64 bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 border border-border/50 shadow-2xl"
+                    align="end"
+                    side="bottom"
+                  >
+                    <DropdownMenuLabel className="font-normal p-4">
+                      <div className="flex items-center space-x-3">
+                        <Avatar className="h-10 w-10">
+                          <AvatarImage src={session.user?.image || "/placeholder.svg?height=40&width=40"} alt="Profile" />
+                          <AvatarFallback className="font-medium">{session.user?.name?.[0]?.toUpperCase() || '?'}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-foreground truncate">{session.user?.name || 'Guest'}</p>
+                          <p className="text-xs font-normal text-muted-foreground truncate">{session.user?.email || 'Not signed in'}</p>
+                        </div>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-border/50" />
+                    {profileMenuItems.map((item) => (
+                      <DropdownMenuItem key={item.name} asChild className="p-0">
+                        <Link
+                          href={item.href}
+                          onClick={(e) => {
+                            if (item.name === "Sign Out") {
+                              e.preventDefault();
+                              signOut();
+                            }
+                          }}
+                          className="flex items-center space-x-3 px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-accent/80 hover:text-accent-foreground hover:translate-x-1 focus:bg-accent focus:text-accent-foreground"
+                        >
+                          <item.icon className="h-4 w-4 flex-shrink-0" />
+                          <span>{item.name}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link href="/login">
                   <Button
                     variant="ghost"
                     className="relative h-9 w-9 rounded-full p-0 transition-all duration-200 hover:ring-2 hover:ring-primary/20 hover:ring-offset-2 focus:ring-2 focus:ring-primary/20 focus:ring-offset-2"
                   >
                     <Avatar className="h-8 w-8 transition-transform duration-200 hover:scale-110">
                       <AvatarImage src="/placeholder.svg?height=32&width=32" alt="Profile" />
-                      <AvatarFallback className="font-medium">JD</AvatarFallback>
+                      <AvatarFallback className="font-medium">?</AvatarFallback>
                     </Avatar>
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-64 bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80 border border-border/50 shadow-2xl"
-                  align="end"
-                  side="bottom"
-                >
-                  <DropdownMenuLabel className="font-normal p-4">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Profile" />
-                        <AvatarFallback className="font-medium">JD</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-foreground truncate">John Doe</p>
-                        <p className="text-xs font-normal text-muted-foreground truncate">john@example.com</p>
-                      </div>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-border/50" />
-                  {profileMenuItems.map((item) => (
-                    <DropdownMenuItem key={item.name} asChild className="p-0">
-                      <Link
-                        href={item.href}
-                        className="flex items-center space-x-3 px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-accent/80 hover:text-accent-foreground hover:translate-x-1 focus:bg-accent focus:text-accent-foreground"
-                      >
-                        <item.icon className="h-4 w-4 flex-shrink-0" />
-                        <span>{item.name}</span>
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Link>
+              )}
             </div>
 
           </div>

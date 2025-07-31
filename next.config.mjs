@@ -21,7 +21,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'i.dummyjson.com',
         pathname: '/data/products/**',
-      }
+      }, {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
     ],
   },
 };

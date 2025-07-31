@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { resolve } from "styled-jsx/css";
 import { CartProvider } from "@/contexts/CartProvider";
+import AUTH_SESSION_PROVIDER from "@/contexts/NextAuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,12 +33,13 @@ export default async function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
       </head>
       <body className="antialiased">
-
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <CartProvider>
-            <main>{children}</main>
-          </CartProvider>
-        </ThemeProvider>
+        <AUTH_SESSION_PROVIDER>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <CartProvider>
+              <main>{children}</main>
+            </CartProvider>
+          </ThemeProvider>
+        </AUTH_SESSION_PROVIDER>
       </body>
     </html>
   )

@@ -12,6 +12,8 @@ export default function useCart() {
   const [promoDialogOpen, setPromoDialogOpen] = useState(false);
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
 
+  
+
   useEffect(() => {
     try {
       const rawCart = localStorage.getItem("cart")
