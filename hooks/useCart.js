@@ -4,13 +4,13 @@ import ValidateProducts from "@/lib/ValidateProducts"
 import { useState, useEffect } from "react"
 
 export default function useCart() {
-  const [cartItems, setCartItems] = useState([])
-  const [isInitialized, setIsInitialized] = useState(false)
-  const [promoCode, setPromoCode] = useState("")
-  const [promoApplied, setPromoApplied] = useState(false)
-  const [promoError, setPromoError] = useState("")
-  const [promoDialogOpen, setPromoDialogOpen] = useState(false)
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false)
+  const [cartItems, setCartItems] = useState([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState("");
+  const [promoDialogOpen, setPromoDialogOpen] = useState(false);
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
 
   useEffect(() => {
     try {
@@ -52,29 +52,29 @@ export default function useCart() {
   }, [cartItems, promoCode, promoApplied, isInitialized])
 
   const addItem = (currentProduct) => {
-    const isExist = cartItems.some((product) => currentProduct.id === product.id)
+    const isExist = cartItems.some((product) => currentProduct._id === product._id)
     if (!isExist) {
       setCartItems((prev) => [...prev, { ...currentProduct, quantity: 1, selected: true }])
     } else {
-      updateQuantity(currentProduct.id, 1)
+      updateQuantity(currentProduct._id, 1)
     }
   }
 
   const removeItem = (currentProduct) => {
-    setCartItems((prev) => prev.filter((product) => product.id !== currentProduct.id))
+    setCartItems((prev) => prev.filter((product) => product._id !== currentProduct._id))
   }
 
   const toggleSelectAll = () => {
     setCartItems((items) => items.map((item) => ({ ...item, selected: !allSelected })))
   }
 
-  const toggleItemSelection = (id) => {
-    setCartItems((items) => items.map((item) => (item.id === id ? { ...item, selected: !item.selected } : item)))
+  const toggleItemSelection = (_id) => {
+    setCartItems((items) => items.map((item) => (item._id === _id ? { ...item, selected: !item.selected } : item)))
   }
 
-  const updateQuantity = (id, change) => {
+  const updateQuantity = (_id, change) => {
     setCartItems((items) =>
-      items.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, item.quantity + change) } : item)),
+      items.map((item) => (item._id === _id ? { ...item, quantity: Math.max(1, item.quantity + change) } : item)),
     )
   }
 

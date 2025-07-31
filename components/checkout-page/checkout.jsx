@@ -421,7 +421,7 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 {selectedItems.map((item) => (
-                  <div key={item.id} className="flex gap-3 items-center">
+                  <div key={item._id} className="flex gap-3 items-center">
                     <div className="w-16 h-16 flex-shrink-0">
                       <Image
                         src={item?.image || item?.images?.[0] || "/placeholder.svg"}
@@ -453,7 +453,7 @@ export default function CheckoutPage() {
                 {/* Items - Desktop Only */}
                 <div className="hidden lg:block space-y-3 max-h-60 overflow-y-auto pr-2">
                   {selectedItems.map((item) => (
-                    <div key={item.id} className="flex gap-3 items-center">
+                    <div key={item._id} className="flex gap-3 items-center">
                       <div className="w-12 h-12 flex-shrink-0">
                         <Image
                           src={item?.image || item?.images?.[0] || "/placeholder.svg"}

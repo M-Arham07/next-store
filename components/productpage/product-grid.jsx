@@ -57,8 +57,8 @@ export default function ProductGrid({ PRODUCTS }) {
                     ) : (
                         filteredProducts.map((product) => (
                             <Link 
-                                href={`${product?.isAvailable ? `/products/${product.id}` : ''}`} 
-                                key={product.id}
+                                href={`${product?.isAvailable ? `/products/${product._id}` : ''}`} 
+                                key={product._id}
                             >
                                 {/*  USING PROP DRILLING TO PASS NOTIFY FUNCTION TO ADD BUTTON */}
                                 <div className="w-full">

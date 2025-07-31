@@ -8,6 +8,8 @@ import AddtoCartButton from "./add-button";
 
 export default function ProductCard({PRODUCT,notifyFunction}) {
 
+  
+
  
   
 

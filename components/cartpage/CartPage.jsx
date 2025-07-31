@@ -9,10 +9,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import Image from "next/image";
 import Link from "next/link";
 import useCart from "@/hooks/useCart";
-import { products } from "@/app/products/page"
-import { CartContext } from "@/contexts/CartProvider"
 
+import { CartContext } from "@/contexts/CartProvider"
 export default function CartPage() {
+    
 
     const {
         cartItems,
@@ -95,11 +95,11 @@ export default function CartPage() {
                                         {/* Mobile Cart Items */}
                                         <div className="space-y-3">
                                             {cartItems.map((item, index) => (
-                                                <div key={item.id}>
+                                                <div key={item._id}>
                                                     <div className="flex items-center gap-3 sm:gap-4 p-4 rounded-lg hover:bg-muted/50 transition-colors border-b border-border/50 pb-4 mx-2">
                                                         <Checkbox
                                                             checked={item.selected}
-                                                            onCheckedChange={() => toggleItemSelection(item.id)}
+                                                            onCheckedChange={() => toggleItemSelection(item._id)}
                                                             className="w-6 h-6 flex-shrink-0"
                                                         />
 
@@ -134,7 +134,7 @@ export default function CartPage() {
                                                                         variant="outline"
                                                                         size="icon"
                                                                         className="w-6 h-6 bg-transparent hover:bg-muted"
-                                                                        onClick={() => updateQuantity(item.id, -1)}
+                                                                        onClick={() => updateQuantity(item._id, -1)}
                                                                     >
                                                                         <Minus className="h-3 w-3" />
                                                                     </Button>
@@ -143,7 +143,7 @@ export default function CartPage() {
                                                                         variant="outline"
                                                                         size="icon"
                                                                         className="w-6 h-6 bg-transparent hover:bg-muted"
-                                                                        onClick={() => updateQuantity(item.id, 1)}
+                                                                        onClick={() => updateQuantity(item._id, 1)}
                                                                     >
                                                                         <Plus className="h-3 w-3" />
                                                                     </Button>
@@ -255,13 +255,13 @@ export default function CartPage() {
                                     {/* Table Items */}
                                     <div className="space-y-4">
                                         {cartItems.map((item, index) => (
-                                            <div key={item.id}>
+                                            <div key={item._id}>
                                                 <div className="grid grid-cols-12 gap-4 items-center py-4 bg-card backdrop-blur-sm border rounded-lg p-4 hover:bg-muted/50 transition-all duration-200 shadow-sm">
                                                     {/* Product Details */}
                                                     <div className="col-span-5 flex items-center gap-4">
                                                         <Checkbox
                                                             checked={item.selected}
-                                                            onCheckedChange={() => toggleItemSelection(item.id)}
+                                                            onCheckedChange={() => toggleItemSelection(item._id)}
                                                             className="w-5 h-5"
                                                         />
                                                         <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted flex-shrink-0">
@@ -285,7 +285,7 @@ export default function CartPage() {
                                                             variant="outline"
                                                             size="icon"
                                                             className="w-8 h-8 bg-transparent hover:bg-muted"
-                                                            onClick={() => updateQuantity(item.id, -1)}
+                                                            onClick={() => updateQuantity(item._id, -1)}
                                                         >
                                                             <Minus className="h-4 w-4" />
                                                         </Button>
@@ -294,7 +294,7 @@ export default function CartPage() {
                                                             variant="outline"
                                                             size="icon"
                                                             className="w-8 h-8 bg-transparent hover:bg-muted"
-                                                            onClick={() => updateQuantity(item.id, 1)}
+                                                            onClick={() => updateQuantity(item._id, 1)}
                                                         >
                                                             <Plus className="h-4 w-4" />
                                                         </Button>

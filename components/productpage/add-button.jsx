@@ -17,6 +17,7 @@ import { useContext } from "react";
 
 
 export default function AddtoCartButton({ currentProduct,notifyFunction }) {
+    
 
     const {
         cartItems,
