@@ -1,7 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/theme-provider";
-import ModernNavbar from "@/components/navbar";
 import { resolve } from "styled-jsx/css";
 import { CartProvider } from "@/contexts/CartProvider";
 
@@ -33,11 +32,10 @@ export default async function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
       </head>
       <body className="antialiased">
-       
+
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-           <CartProvider>
-          <ModernNavbar />
-          <main className="p-4 md:p-6">{children}</main>
+          <CartProvider>
+            <main>{children}</main>
           </CartProvider>
         </ThemeProvider>
       </body>
