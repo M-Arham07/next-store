@@ -1,6 +1,8 @@
 "use client"
 
+import { RetrieveCartfromDB, SaveCartToDB } from "@/backend-utilities/cart-related/SaveAndRetrieveCart";
 import ValidateProducts from "@/lib/ValidateProducts"
+import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react"
 
 export default function useCart() {
@@ -12,23 +14,55 @@ export default function useCart() {
   const [promoDialogOpen, setPromoDialogOpen] = useState(false);
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
 
-  
+  const { data: session } = useSession();
+
+
 
   useEffect(() => {
-    try {
-      const rawCart = localStorage.getItem("cart")
-      if (rawCart) {
-        const cart = JSON.parse(rawCart)
-        const isOK = ValidateProducts(cart)
-        if (!isOK) throw new Error("Invalid Cart")
-        setCartItems(cart)
-      } else {
-        setCartItems([])
-      }
 
+
+    try {
+      const syncCart = async () => {
+
+        let dbCart = [];
+        let localCart = [];
+        let mergedCart = [];
+
+
+
+        if (session && session?.user) {
+          dbCart = await RetrieveCartfromDB(session?.user?.email);
+
+        }
+
+
+        const rawCart = localStorage.getItem("cart");
+        if (rawCart) {
+          localCart = JSON.parse(rawCart);
+          const isOK = ValidateProducts(localCart);
+          if (!isOK) throw new Error("Invalid Cart");
+
+          // MERGE CART LOGIC: 
+          mergedCart = [...dbCart, ...localCart].filter((item,index,arr)=>{
+
+            return arr.findIndex(i=>i._id === item._id) === index // only return true for unique items (means only keep unique items)
+
+          });
+
+          console.log("The merged cart is :",mergedCart);
+
+
+
+          setCartItems(mergedCart);
+        } else {
+          setCartItems(dbCart) // fallback to dbCart if no cart in localStorage
+        }
+      }
+      syncCart();
       // Load promo state from localStorage
       const savedPromoCode = localStorage.getItem("promoCode")
       const savedPromoApplied = localStorage.getItem("promoApplied")
+
 
       if (savedPromoCode) {
         setPromoCode(savedPromoCode)
@@ -42,8 +76,7 @@ export default function useCart() {
       setCartItems([])
     }
     setIsInitialized(true)
-  }, [])
-
+  }, [session]); // session isnt available instantly on mount, so run this useEffect on mount + change in session!
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem("cart", JSON.stringify(cartItems))
@@ -51,6 +84,8 @@ export default function useCart() {
       localStorage.setItem("promoCode", promoCode)
       localStorage.setItem("promoApplied", promoApplied.toString())
     }
+
+    if (session?.user) SaveCartToDB(session?.user?.email, cartItems)
   }, [cartItems, promoCode, promoApplied, isInitialized])
 
   const addItem = (currentProduct) => {

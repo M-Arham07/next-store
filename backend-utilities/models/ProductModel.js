@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { type } from "os";
 const Schema=mongoose.Schema;
 
 const productSchema = new Schema({
@@ -31,8 +32,18 @@ const productSchema = new Schema({
     },
     images:{
         type:[String]
+    },
+    quantity:{
+        type:Boolean,
+        required:true
+
+    },
+    selected:{
+        type:Boolean,
+        required:true
+
     }
     
-});
+},{collection:"products"});
 
 export default mongoose.models.Product || mongoose.model("Product",productSchema);

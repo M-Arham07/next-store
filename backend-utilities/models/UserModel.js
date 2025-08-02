@@ -1,7 +1,6 @@
 
 import mongoose from 'mongoose';
 
-
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -18,8 +17,10 @@ const userSchema = new Schema({
         type:String
     },
     cart:{
-        type:[String]
+        type:[mongoose.Schema.Types.Mixed], // MIXED IS EQUAL TO :any in JS/TS
+        // MEANS CART CAN STORE ANY VALUE (CUZ I DONT WANT TO DEFINE ANOTHER BIG SCHEMA)
+        default:[] //sets a default empty array for cart
     }
-});
+},{collection:"users"});
 
 export default mongoose.models.User || mongoose.model("User",userSchema);
