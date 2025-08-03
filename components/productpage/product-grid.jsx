@@ -10,6 +10,7 @@ import AlertNotification from "../AlertNotification";
 
 
 export default function ProductGrid({ PRODUCTS }) {
+    
     const router = useRouter();
     const searchParams = useSearchParams();
     const [filteredProducts, setFilteredProducts] = useState(PRODUCTS);

@@ -13,7 +13,7 @@ const productSchema = new Schema({
     },
     rating:{
         type:Number,
-        required:true
+        default:0,
     },
     price:{
         type:Number,
@@ -33,17 +33,11 @@ const productSchema = new Schema({
     images:{
         type:[String]
     },
-    quantity:{
-        type:Boolean,
+    availableUnits:{
+        type:Number,
         required:true
-
-    },
-    selected:{
-        type:Boolean,
-        required:true
-
     }
     
-},{collection:"products"});
+},{collection:"products",timestamps:true});
 
 export default mongoose.models.Product || mongoose.model("Product",productSchema);

@@ -17,6 +17,6 @@ const GetProducts = unstable_cache(async () => {
     products=JSON.parse(JSON.stringify(products));
     return products;
 }, ['products'],
-    { revalidate: 60, tags: ['products'] }
+    { tags: ['products'] }
 );
 export default GetProducts;

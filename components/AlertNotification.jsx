@@ -36,7 +36,7 @@ function Alert({ message, linkName, linkHref }) {
   );
 }
 
-export default function AlertNotification({ message, linkName, linkHref }) {
+export default function AlertNotification({ message, linkName, linkHref='#' }) {
   return (
     <div className="notification-container fixed bottom-4 left-4">
       <Alert

@@ -17,17 +17,21 @@ const nextConfig = {
         hostname: 'images.unsplash.com',
         pathname: '/photo-**',
       },
-        {
+      {
         protocol: 'https',
         hostname: 'i.dummyjson.com',
         pathname: '/data/products/**',
-      }, {
+      },
+      {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com',
         pathname: '/**',
-      },
+      }
     ],
-  },
+    domains: ['localhost'],
+    dangerouslyAllowSVG: true,
+    unoptimized: true
+  }
 };
 
 export default nextConfig;

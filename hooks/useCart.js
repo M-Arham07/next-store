@@ -1,7 +1,7 @@
 "use client"
 
 import { RetrieveCartfromDB, SaveCartToDB } from "@/backend-utilities/cart-related/SaveAndRetrieveCart";
-import ValidateProducts from "@/lib/ValidateProducts"
+import ValidateCartProducts from "@/lib/ValidateCartProducts"
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react"
 
@@ -39,7 +39,7 @@ export default function useCart() {
         const rawCart = localStorage.getItem("cart");
         if (rawCart) {
           localCart = JSON.parse(rawCart);
-          const isOK = ValidateProducts(localCart);
+          const isOK = ValidateCartProducts(localCart);
           if (!isOK) throw new Error("Invalid Cart");
 
           // MERGE CART LOGIC: 
@@ -49,7 +49,7 @@ export default function useCart() {
 
           });
 
-          console.log("The merged cart is :",mergedCart);
+          // console.log("The merged cart is :",mergedCart);
 
 
 

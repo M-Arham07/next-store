@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import { resolve } from "styled-jsx/css";
 import { CartProvider } from "@/contexts/CartProvider";
 import AUTH_SESSION_PROVIDER from "@/contexts/NextAuthProvider";
+import { EdgeStoreProvider } from "@/contexts/EdgeStoreProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,6 +40,7 @@ export default async function RootLayout({ children }) {
               <main>{children}</main>
             </CartProvider>
           </ThemeProvider>
+    
         </AUTH_SESSION_PROVIDER>
       </body>
     </html>

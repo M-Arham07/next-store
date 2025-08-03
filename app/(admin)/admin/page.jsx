@@ -1,4 +1,5 @@
+import AdminDashboard from "@/components/admin/dashboard/dashboard";
 
-export default async function ADMIN_PANEL(){
-    return <h1> Welcome to ADMIN PANEL </h1>
+export default function ADMIN_PANEL(){
+    return <AdminDashboard />
 }

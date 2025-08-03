@@ -13,7 +13,19 @@ export default function ProductCard({PRODUCT,notifyFunction}) {
  
   
 
-  const { isAvailable = true, rating = 4.5, oldPrice = "$45.00", image = '/s24u.jpg', id, title:name , category } = PRODUCT;
+  const { 
+    isAvailable = true, 
+    rating = 4.5, 
+    oldPrice, 
+    price, 
+    images,  
+    title: name, 
+    category,
+    reviews = 0 
+  } = PRODUCT;
+
+  // Calculate discount percentage
+  const discount = oldPrice && price ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
   
 
   return (
@@ -29,9 +41,10 @@ export default function ProductCard({PRODUCT,notifyFunction}) {
     >
       {/* Product Image - Full Width Upper Section */}
       <div className="relative h-32 sm:h-40 md:h-44 flex-shrink-0">
+        {/* if images.length is equal to zero, set src to  null else use first imag from images array */}
         <Image
-          src={image}
-          alt="Snickers Off-White 2024 sneaker"
+          src={(!images || images.length === 0 || !images[0]) ? "/placeholder.svg" : images[0]}
+          alt={name || "Product image"}
           width={240}
           height={200}
           className={`w-full h-full object-cover transition-transform duration-500 ${isAvailable ? "hover:scale-110" : "grayscale"}`}
@@ -61,17 +74,23 @@ export default function ProductCard({PRODUCT,notifyFunction}) {
           </div>
           {/* Price Section */}
           <div className="flex items-center gap-1 sm:gap-2 flex-wrap mb-1 sm:mb-2">
-            <p className="text-sm sm:text-lg md:text-xl font-bold text-[#252b42] dark:text-white">$38.00</p>
-            <p className="text-xs sm:text-sm text-[#737373] dark:text-gray-400 line-through">{oldPrice}</p>
-            <span className="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-1 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold">
-              16% off
-            </span>
+            <p className="text-sm sm:text-lg md:text-xl font-bold text-[#252b42] dark:text-white">${price?.toFixed(2)}</p>
+            {oldPrice && oldPrice > price && (
+              <>
+                <p className="text-xs sm:text-sm text-[#737373] dark:text-gray-400 line-through">${oldPrice?.toFixed(2)}</p>
+                {discount > 0 && (
+                  <span className="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 px-1 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold">
+                    {discount}% off
+                  </span>
+                )}
+              </>
+            )}
           </div>
           {/* Rating */}
           <div className="flex items-center gap-1 mb-1 sm:mb-2">
             <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-yellow-400 text-yellow-400" />
             <span className="text-xs sm:text-sm font-medium text-[#252b42] dark:text-white">{rating}</span>
-            <span className="text-[10px] sm:text-xs text-[#737373] dark:text-gray-400">(124)</span>
+            <span className="text-[10px] sm:text-xs text-[#737373] dark:text-gray-400">({reviews})</span>
           </div>
         </div>
       </div>
