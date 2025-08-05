@@ -3,7 +3,11 @@ import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 
-export default function UnavailableProduct() {
+export default function UnavailableProduct({
+  linkHref='/products',
+  TIPS = ["Browse our other available products","Check back later for availability","Contact us for more information"]
+
+}) {
   return (
     <div className="col-span-full flex flex-col items-center justify-center mt-1 px-4">
       {/* Icon Container */}
@@ -28,15 +32,17 @@ export default function UnavailableProduct() {
       <div className="text-sm text-gray-500 dark:text-gray-400 mb-6 text-center max-w-md">
         <p className="mb-2">What you can do:</p>
         <ul className="space-y-1">
-          <li>• Browse our other available products</li>
-          <li>• Check back later for availability</li>
-          <li>• Contact us for more information</li>
+          {
+            TIPS.map((tip,index)=><li key={index}>• {tip} </li>)
+          }
+          
+        
         </ul>
       </div>
 
       {/* Action Button */}
       <div className="flex justify-center">
-        <Link href="/products">
+        <Link href={linkHref}>
           <Button className="flex items-center gap-2 cursor-pointer">Browse Other Products</Button>
         </Link>
       </div>

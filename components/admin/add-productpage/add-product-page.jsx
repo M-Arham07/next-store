@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -29,240 +29,164 @@ import { useRouter } from "next/navigation"
 
 
 
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/svg+xml"];
-const MB = 1 // change this to control max file size for images
-const MAX_FILE_SIZE = MB * 1024 * 1024; // 5MB
-const IMAGES_LIMIT = 6;
+import ImageUploadSection from "../image-upload-section";
 
+// Constants for image upload configuration:
+
+const MB_LIMIT = 5;
+
+const IMAGE_CONFIG = {
+  ACCEPTED_IMAGE_TYPES:["image/jpeg", "image/jpg", "image/png", "image/svg+xml"],
+  MB : MB_LIMIT,
+  MAX_FILE_SIZE : MB_LIMIT * 1024 * 1024,
+  IMAGES_LIMIT : 6,
+}
+
+  const { ACCEPTED_IMAGE_TYPES, MB, MAX_FILE_SIZE, IMAGES_LIMIT } = IMAGE_CONFIG;
 
 const formSchema = z.object({
-    title: z.string().min(3, "Title must be at least 3 characters"),
-    price: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {
-        message: "Price must be a valid positive number",
-    }),
-    oldPrice: z.string().refine((val) => !isNaN(val) && Number(val) >= 0, {
-        message: "Original price must be a valid non-negative number",
-    }),
-    category: z.string().min(1, "Please select a category"),
-    description: z.string().min(10, "Description must be at least 10 characters"),
-    availableUnits: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {
-        message: "Units must be a valid number greater than 0",
-    }),
-    images: z
-        .array(z.object({
-            id: z.string(),
-            file: z.any()
-                .refine((file) => file?.size <= MAX_FILE_SIZE, 'Max file size is 5MB')
-                .refine(
-                    (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
-                    'Only .jpg, .jpeg, .png and .svg formats are supported'
-                ),
-            preview: z.string(),
-        }))
-        .min(1, "At least one image is required")
-        .max(IMAGES_LIMIT, `Maximum ${IMAGES_LIMIT} images allowed`),
+  title: z.string().min(3, "Title must be at least 3 characters"),
+  price: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {
+    message: "Price must be a valid positive number",
+  }),
+  oldPrice: z.string().refine((val) => !isNaN(val) && Number(val) >= 0, {
+    message: "Original price must be a valid non-negative number",
+  }),
+  category: z.string().min(1, "Please select a category"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  availableUnits: z.string().refine((val) => !isNaN(val) && Number(val) > 0, {
+    message: "Units must be a valid number greater than 0",
+  }),
+  images: z
+    .array(z.object({
+      id: z.string(),
+      file: z.any()
+        .refine((file) => file?.size <= MAX_FILE_SIZE, `Max file size is ${MAX_FILE_SIZE / (1024 * 1024)}MB`)
+        .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
+          'Only .jpg, .jpeg, .png and .svg formats are supported'
+        ),
+      preview: z.string(),
+    }))
+    .min(1, "At least one image is required")
+    .max(IMAGES_LIMIT, `Maximum ${IMAGES_LIMIT} images allowed`),
 })
-    .refine((data) => {
-        const { price, oldPrice } = data;
-        return Number(oldPrice) > Number(price);
-    }, {
-        message: "Original price must be greater than current price",
-        path: ["oldPrice"]
-    })
+  .refine((data) => {
+    const { price, oldPrice } = data;
+    return Number(oldPrice) > Number(price);
+  }, {
+    message: "Original price must be greater than current price",
+    path: ["oldPrice"]
+  })
 
 export default function AddProductPage() {
-    const router = useRouter();
+  const router = useRouter();
 
 
-    const { uploadImages, Progress } = useUploadImages();
+  const { uploadImages, Progress } = useUploadImages();
 
-    //PROGRESS MODAL:
-    const [modalOpen, setModalOpen] = useState(false);
-    const [modalStatus, setModalStatus] = useState("saving"); // default is saving!
-
-
-
-    const form = useForm({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            title: "",
-            price: "",
-            oldPrice: "",
-            category: "",
-            description: "",
-            availableUnits: "",
-            images: [],
-        },
-    })
+  //PROGRESS MODAL:
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalStatus, setModalStatus] = useState("saving"); // default is saving!
 
 
 
-    const [productImages, setProductImages] = useState([])
-    const [dragActive, setDragActive] = useState(false)
-    const [imageError, setImageError] = useState("") //default is saving!
-    const [previewImage, setPreviewImage] = useState(null)
-    const fileInputRef = useRef(null)
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      price: "",
+      oldPrice: "",
+      category: "",
+      description: "",
+      availableUnits: "",
+      images: [],
+    },
+  })
 
-    const categories = [
-        "Electronics",
-        "Smartphones",
-        "Clothing",
-        "Home & Garden",
-        "Sports & Outdoors",
-        "Books",
-        "Toys & Games",
-        "Health & Beauty",
-        "Automotive",
-    ]
 
-    const handleDrag = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        if (e.type === "dragenter" || e.type === "dragover") {
-            setDragActive(true)
-        } else if (e.type === "dragleave") {
-            setDragActive(false)
-        }
-    }
 
-    const handleDrop = (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        setDragActive(false)
+  const [productImages, setProductImages] = useState([])
 
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            handleFiles(e.dataTransfer.files)
-        }
-    }
+  const updateFormImages = (images) => {
+    setProductImages(images);
+    form.setValue('images', images);
+  }
 
-    const handleFileInput = (e) => {
-        if (e.target.files) {
-            handleFiles(e.target.files)
-        }
-    }
+  const categories = [
+    "Electronics",
+    "Smartphones",
+    "Clothing",
+    "Home & Garden",
+    "Sports & Outdoors",
+    "Books",
+    "Toys & Games",
+    "Health & Beauty",
+    "Automotive",
+  ]
 
-    const handleFiles = (files) => {
-        const newImages = []
-        const errors = []
 
-        // Check if adding new files would exceed the maximum limit
 
-        /*
-         For example limit is 7. There are already 4 images. 
-         Now if user tries to upload 5 more images, then file.length becomes 5 , 
-         and when both existing product images and new images are added,
-         they give the result 4+5=9,which is greater than limit, so they're rejected
-        */
 
-        if (productImages.length + files.length > IMAGES_LIMIT) {
-            setImageError(`Maximum ${IMAGES_LIMIT} images allowed`)
-            return
-        }
 
-        Array.from(files).forEach((file) => {
-            if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-                errors.push(`${file.name} is not a supported format`)
-                return
-            }
-            if (file.size > MAX_FILE_SIZE) {
-                errors.push(`${file.name} exceeds 5MB limit`)
-                return
-            }
 
-            const id = Math.random().toString(36).substr(2, 9)
-            const preview = URL.createObjectURL(file)
-            newImages.push({
-                id,
-                file,
-                preview,
-            })
-        })
 
-        if (errors.length > 0) {
-            setImageError(errors.join(", "))
-            return
-        }
 
-        const updatedImages = [...productImages, ...newImages];
-        updateFormImages(updatedImages);
-        setImageError("")
-    }
 
-    const removeImage = (id) => {
-        const newImages = productImages.filter((img) => img.id !== id);
-        setProductImages(newImages);
-        // Update form field when images change
-        form.setValue('images', newImages);
-    }
 
-    // Update form when files are added
-    const updateFormImages = (images) => {
-        setProductImages(images);
-        form.setValue('images', images);
+
+
+
+  const onSubmit = async (values) => {
+
+
+    setModalOpen(true);
+
+
+    const productData = {
+      ...values,
+      price: Number.parseFloat(values.price),
+      oldPrice: Number.parseFloat(values.oldPrice),
+      availableUnits: Number.parseInt(values.availableUnits),
+      images: values.images.map(img => img.file), // images is an array of image files (pure files,no other thing)
     }
 
 
 
+    const imageURLS = await uploadImages(productData.images);
+    if (!imageURLS) { setModalStatus("failed"); return false; };
 
+    // SAVING PRODUCT LOGIC:
 
-
-
-
-
-
-
-
-    const onSubmit = async (values) => {
-
-
-        setModalOpen(true);
-
-
-        const productData = {
-            ...values,
-            price: Number.parseFloat(values.price),
-            oldPrice: Number.parseFloat(values.oldPrice),
-            availableUnits: Number.parseInt(values.availableUnits),
-            images: values.images.map(img => img.file), // images is an array of image files (pure files,no other thing)
-        }
-
-
-
-        const imageURLS = await uploadImages(productData.images);
-        if (!imageURLS) { setModalStatus("failed"); return false; };
-
-        // SAVING PRODUCT LOGIC:
-
-        // CONSTRUCT THE ACTUAL PRODUCT AS IN DB:
-        const newProduct = {
-            ...productData, images: imageURLS, isAvailable: true
-        }
-
-        // CALL SERVER ACTION TO SAVE PRODUCT IN DATABASE:
-
-        const isSaved = await SaveProductToDB(newProduct);
-
-        if (!isSaved) { setModalStatus("failed"); return false; };
-
-
-        // AS PRODUCT IS SAVED SO SHOW SUCCESS:
-
-        setModalStatus("success");
-       
-        return true;
-
-
-
-
-
-
-
-
+    // CONSTRUCT THE ACTUAL PRODUCT AS IN DB:
+    const newProduct = {
+      ...productData, images: imageURLS, isAvailable: true
     }
 
+    // CALL SERVER ACTION TO SAVE PRODUCT IN DATABASE:
+
+    const isSaved = await SaveProductToDB(newProduct);
+
+    if (!isSaved) { setModalStatus("failed"); return false; };
 
 
-     return (
+    // AS PRODUCT IS SAVED SO SHOW SUCCESS:
+
+    setModalStatus("success");
+
+    return true;
+
+
+
+
+
+
+
+
+  }
+
+
+
+  return (
     <div className="min-h-screen bg-gray-50 dark:bg-black pt-4 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <ProgressModal
@@ -426,95 +350,12 @@ export default function AddProductPage() {
                   </div>
 
                   {/* Right Column - Image Upload */}
-                  <div className="space-y-4">
-                    <FormLabel className="dark:text-gray-200">Product Images *</FormLabel>
-
-                    {/* Upload Area */}
-                    <div
-                      className={cn(
-                        "border-2 border-dashed rounded-lg p-6 text-center transition-colors dark:bg-black",
-                        dragActive
-                          ? "border-white bg-white/5 dark:bg-white/10"
-                          : "border-gray-300 dark:border-white/10",
-                        imageError ? "border-red-500" : "",
-                      )}
-                      onDragEnter={handleDrag}
-                      onDragLeave={handleDrag}
-                      onDragOver={handleDrag}
-                      onDrop={handleDrop}
-                    >
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        multiple
-                        accept="image/*"
-                        onChange={handleFileInput}
-                        className="hidden"
-                      />
-                      <ImageIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
-                      <p className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                        Drag and drop images here
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">or click to browse files</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                        Supported formats: JPG, JPEG, PNG, SVG (max 5MB)
-                      </p>
-                      <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                        <Upload className="w-4 h-4 mr-2" />
-                        Choose Files
-                      </Button>
-                    </div>
-
-                    {imageError && <p className="text-sm text-red-500">{imageError}</p>}
-
-                    {/* Image Preview Grid */}
-                    {productImages.length > 0 && (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                        {productImages.map((image, index) => (
-                          <div
-                            key={image.id}
-                            className="relative group border-2 border-gray-200 dark:border-white/10 rounded-lg overflow-hidden transition-all hover:border-gray-300 dark:hover:border-white/20"
-                          >
-                            <Image
-                              src={image.preview || "/placeholder.svg"}
-                              alt={`Product ${index + 1}`}
-                              width={400}
-                              height={300}
-                              className="w-full h-24 sm:h-32 object-cover cursor-pointer"
-                              onClick={() => setPreviewImage(image.preview)}
-                            />
-                            {/* Action Buttons */}
-                            <div className="absolute top-2 right-2 flex gap-1">
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="secondary"
-                                className="h-6 w-6 p-0 bg-white/90 hover:bg-white dark:bg-black/90 dark:hover:bg-black"
-                                onClick={() => setPreviewImage(image.preview)}
-                              >
-                                <Eye className="h-3 w-3" />
-                              </Button>
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="destructive"
-                                className="h-6 w-6 p-0"
-                                onClick={() => removeImage(image.id)}
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {productImages.length > 0 && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {productImages.length} image{productImages.length !== 1 ? "s" : ""} uploaded
-                      </p>
-                    )}
-                  </div>
+                  <ImageUploadSection
+                    productImages={productImages}
+                    updateFormImages={updateFormImages}
+                    form={form}
+                    IMAGE_CONFIG={IMAGE_CONFIG}
+                  />
                 </div>
 
                 {/* Submit Button - Full Width */}
@@ -526,25 +367,6 @@ export default function AddProductPage() {
           </CardContent>
         </Card>
 
-        {/* Image Preview Modal */}
-        <Dialog open={!!previewImage} onOpenChange={() => setPreviewImage(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-            <DialogHeader className="p-6 pb-0">
-              <DialogTitle>Image Preview</DialogTitle>
-            </DialogHeader>
-            <div className="p-6 pt-0">
-              {previewImage && (
-                <Image
-                  src={previewImage || "/placeholder.svg"}
-                  alt="Preview"
-                  width={1200}
-                  height={800}
-                  className="w-full h-auto max-h-[70vh] object-contain rounded-lg"
-                />
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
     </div>
   )

@@ -243,7 +243,7 @@ export default function ManageProductsPage({ products = [] }) {
                                             <Eye className="mr-1 h-3 w-3" />
                                             View
                                         </Button>
-                                        <Button variant="outline" size="sm" onClick={() => handleEditClick(product._id)}>
+                                        <Button variant="outline" size="sm" onClick={() => router.push(`/admin/products/edit/${product._id}`)}>
                                             <Edit className="mr-1 h-3 w-3" />
                                             Edit
                                         </Button>
@@ -281,7 +281,7 @@ export default function ManageProductsPage({ products = [] }) {
                                                 <Eye className="mr-1 h-3 w-3" />
                                                 View
                                             </Button>
-                                            <Button variant="outline" size="sm" onClick={() => handleEditClick(product._id)}>
+                                            <Button variant="outline" size="sm" onClick={() => router.push(`/admin/products/edit/${product._id}`)}>
                                                 <Edit className="mr-1 h-3 w-3" />
                                                 Edit
                                             </Button>

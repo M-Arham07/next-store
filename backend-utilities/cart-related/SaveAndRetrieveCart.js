@@ -20,7 +20,7 @@ export async function SaveCartToDB(EMAIL, CART_ITEMS) {
             { new: true }
         );
 
-        console.log("UPDATED USER", inserted)
+       
 
     }
     catch (err) {
