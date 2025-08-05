@@ -345,6 +345,7 @@ export default function ManageProductsPage({ products = [] }) {
                                         setIsDeleting(true);
                                         await DeleteProduct(ProductToDelete._id);
                                         notify();
+                                        setIsDeleting(false);
                                         setShowDeleteAlert(false);
                                   
                                 }}

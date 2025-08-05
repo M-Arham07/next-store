@@ -20,7 +20,12 @@ const userSchema = new Schema({
         type:[mongoose.Schema.Types.Mixed], // MIXED IS EQUAL TO :any in JS/TS
         // MEANS CART CAN STORE ANY VALUE (CUZ I DONT WANT TO DEFINE ANOTHER BIG SCHEMA)
         default:[] //sets a default empty array for cart
+    },
+    isAdmin:{
+        type:Boolean, // FOR CHECKING IF USER ADMIN OR NOT, DEFAULT IS FALSE!
+        default:false
     }
+
 },{collection:"users",timestamps:true});
 
 export default mongoose.models.User || mongoose.model("User",userSchema);
