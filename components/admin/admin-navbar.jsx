@@ -38,7 +38,7 @@ const navigationItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard, description: "Admin Overview" },
   { name: "Orders", href: "/admin/orders", icon: ShoppingCart, description: "Manage Orders" },
   { name: "Manage Products", href: "/admin/products", icon: Package, description: "Product Management" },
-  { name: "Users", href: "/admin/users", icon: Users, description: "User Management" },
+  { name: "Manage Users", href: "/admin/manage-users", icon: Users, description: "User Management" },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3, description: "View Analytics" },
 ]
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState,useRef } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -20,19 +20,46 @@ import { Badge } from "@/components/ui/badge"
 import { Eye, Trash2, UserMinus, Sparkles, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import DeleteUser from "@/backend-utilities/delete-user/DeleteUser";
+import useNotification from "@/hooks/useNotification";
+import AlertNotification from "@/components/AlertNotification"
+
+
+
 
 // Format users to match required structure
-const formatUser = (user) => ({
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  avatar: user.image || "/placeholder.svg",
-  joinedAt: new Date(user.createdAt),
-  lastActive: new Date(user.updatedAt),
-  isAdmin: user?.isAdmin || false
-});
+const formatUser = (user) => {
+  // Safe date parsing function
+  const parseDate = (dateString) => {
+    try {
+      if (!dateString) return new Date();
+      const date = new Date(dateString);
+      return isNaN(date.getTime()) ? new Date() : date;
+    } catch (error) {
+      console.error("Date parsing error:", error);
+      return new Date();
+    }
+  };
+
+  // Debug log
+  
+
+  return {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    avatar: user.image || "/placeholder.svg",
+    joinedAt: parseDate(user.createdAt),
+    lastActive: parseDate(user.updatedAt),
+    isAdmin: user?.isAdmin || false
+  };
+};
 
 export default function ManageUsersPage({ ALL_USERS = [] }) {
+
+  const {showNotification,notify} = useNotification(3000);
+
+
   // Format and separate users and admins based on isAdmin property
   const initialSeparatedUsers = ALL_USERS.reduce(
     (acc, user) => {
@@ -96,7 +123,7 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
     users.filter(
       (user) =>
         user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchQuery.toLowerCase()),
+        user?.email?.toLowerCase().includes(searchQuery.toLowerCase()),
     ),
   )
 
@@ -133,10 +160,17 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
     setIsDeleteDialogOpen(true)
   }
 
-  const confirmDeleteUser = () => {
-    setUsers(users.filter((user) => user.id !== userToDelete.id))
-    setIsDeleteDialogOpen(false)
-    setUserToDelete(null)
+
+  const [deletedUserName,setDeletedUserName] = useState(null);
+  const confirmDeleteUser = async () => {
+    // DELETE USER LOGIC, we're using id cuz its mapped to _id in this page!
+    
+    await DeleteUser(userToDelete.id);
+    setDeletedUserName(userToDelete.name)
+    notify();
+    setUsers(users.filter((user) => user.id !== userToDelete.id));
+    setIsDeleteDialogOpen(false);
+    setUserToDelete(null);
   }
 
   const handleRevokeAdmin = (admin) => {
@@ -145,6 +179,7 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
   }
 
   const confirmRevokeAdmin = () => {
+    // REMOVE ADMIN LOGIC
     setAdmins(admins.filter((admin) => admin.id !== adminToRevoke.id))
     setIsRevokeDialogOpen(false)
     setAdminToRevoke(null)
@@ -187,6 +222,9 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
       </CardContent>
     </Card>
   )
+
+
+  
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
@@ -275,9 +313,9 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
             <AccordionContent className="px-4 pb-4">
               <div className="space-y-3">
                 {filteredAdmins.length > 0 ? (
-                  filteredAdmins.map((admin) => (
+                  filteredAdmins.map((admin,index) => (
                     <UserCard
-                      key={admin.id}
+                      key={admin.id || index}
                       user={admin}
                       isAdmin={true}
                       onView={handleViewUser}
@@ -305,17 +343,19 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
                 <Badge variant="secondary">{filteredUsers.length}</Badge>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="px-4 pb-4">
+            <AccordionContent className="px-4 pb-4"> 
+         
               <div className="space-y-3">
                 {filteredUsers.length > 0 ? (
-                  filteredUsers.map((user) => (
-                    <UserCard key={user.id} user={user} onView={handleViewUser} onDelete={handleDeleteUser} />
+                  filteredUsers.map((user,index) => (
+                    <UserCard key={user.id || index} user={user} onView={handleViewUser} onDelete={handleDeleteUser} />
                   ))
                 ) : (
                   <p className="text-muted-foreground text-center py-4">
                     {searchQuery ? "No users found matching your search." : "No users found."}
                   </p>
                 )}
+               
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -416,6 +456,8 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {showNotification && <AlertNotification message={`${deletedUserName} Deleted Successfully!`}/>}
     </div>
   )
 }
