@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { headers } from "next/headers";
+
 
 export default async function middleware(request) {
 
 
-  const forbidden_html_page = `<!DOCTYPE html>
+    const forbidden_html_page = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -101,35 +101,36 @@ export default async function middleware(request) {
 </body>
 </html>`
 
-  try {
+    try {
 
-    const secret = process.env.NEXTAUTH_SECRET;
+        const secret = process.env.NEXTAUTH_SECRET;
 
-    const token = await getToken({ req: request, secret });
+        const token = await getToken({ req: request, secret });
+        console.log("RECEIVED TOKEN:", token || "No token")
 
-    if (!token) throw new Error("No token found!");
+        if (!token) throw new Error("No token found!");
 
-    if (!token.isAdmin) throw new Error(`${token.email} is not an admin!`);
+        if (!token.isAdmin) throw new Error(`${token.email} is not an admin!`);
 
-    // IF ALL ABOVE CHECKS ARE PASSED, MEANS USER IS ADMIN SO ALLOW ADMIN ROUTE!
-    console.log("WELCOME TO ADMIN MODE", token.email);
-    return NextResponse.next();
+        // IF ALL ABOVE CHECKS ARE PASSED, MEANS USER IS ADMIN SO ALLOW ADMIN ROUTE!
+        console.log("WELCOME TO ADMIN MODE", token.email);
+        return NextResponse.next();
 
 
-  }
-  catch (err) {
-    console.error("Admin verification failed at middleware! Logs:", err?.message);
-
-    return new NextResponse(forbidden_html_page, {
-      status: 403,
-      headers: {
-        "Content-Type": "text/html"
-      }
     }
-    )
-  }
+    catch (err) {
+        console.error("Admin verification failed at middleware! Logs:", err?.message);
+
+        return new NextResponse(forbidden_html_page, {
+            status: 403,
+            headers: {
+                "Content-Type": "text/html"
+            }
+        }
+        )
+    }
 }
 
 export const config = {
-  matcher: ["/admin/:path*"] // RUN MIDDELWARE ONLY ON /admin and all its subpaths! :
+    matcher: ["/admin/:path*"] // RUN MIDDELWARE ONLY ON /admin and all its subpaths! :
 }

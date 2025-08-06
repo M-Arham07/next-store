@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState,useRef } from "react"
+import {  useState, useRef } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -23,6 +23,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import DeleteUser from "@/backend-utilities/delete-user/DeleteUser";
 import useNotification from "@/hooks/useNotification";
 import AlertNotification from "@/components/AlertNotification"
+import RevokeAdmin from "@/backend-utilities/revoke-admin/revoke-admin"
+
+
+
+let SUPERUSER_EMAIL = process.env.SUPERUSER_EMAIL;
+
 
 
 
@@ -42,7 +48,7 @@ const formatUser = (user) => {
   };
 
   // Debug log
-  
+
 
   return {
     id: user._id,
@@ -51,13 +57,14 @@ const formatUser = (user) => {
     avatar: user.image || "/placeholder.svg",
     joinedAt: parseDate(user.createdAt),
     lastActive: parseDate(user.updatedAt),
-    isAdmin: user?.isAdmin || false
+    isAdmin: user?.isAdmin || false,
+    isSuperuser: user?.isSuperuser || false
   };
 };
 
-export default function ManageUsersPage({ ALL_USERS = [] }) {
+export default function ManageUsersPage({ ALL_USERS = [], SU = false }) {
 
-  const {showNotification,notify} = useNotification(3000);
+  const { showNotification, notify } = useNotification(3000);
 
 
   // Format and separate users and admins based on isAdmin property
@@ -161,12 +168,14 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
   }
 
 
-  const [deletedUserName,setDeletedUserName] = useState(null);
+  const [alertMessage,setAlertMessage] = useState("");
+
   const confirmDeleteUser = async () => {
     // DELETE USER LOGIC, we're using id cuz its mapped to _id in this page!
-    
+
     await DeleteUser(userToDelete.id);
-    setDeletedUserName(userToDelete.name)
+
+    setAlertMessage(`${userToDelete.name} was deleted successfully `)
     notify();
     setUsers(users.filter((user) => user.id !== userToDelete.id));
     setIsDeleteDialogOpen(false);
@@ -178,14 +187,24 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
     setIsRevokeDialogOpen(true)
   }
 
-  const confirmRevokeAdmin = () => {
-    // REMOVE ADMIN LOGIC
+ 
+
+  
+  const confirmRevokeAdmin = async () => {
+    // REMOVE ADMIN LOGIC:
+    //  We're using id cuz its mapped to _id in this page!
+    await RevokeAdmin(adminToRevoke.id);
+    setAlertMessage(`Revoked Admin Rights for ${adminToRevoke.name}`)
+    notify();
     setAdmins(admins.filter((admin) => admin.id !== adminToRevoke.id))
     setIsRevokeDialogOpen(false)
     setAdminToRevoke(null)
   }
 
   const UserCard = ({ user, isAdmin = false, onView, onDelete, onRevoke }) => (
+
+
+
     <Card className="mb-3">
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
@@ -208,7 +227,16 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
             <Button variant="outline" size="sm" onClick={() => onView(user, isAdmin)} className="h-8 w-8 p-0">
               <Eye className="h-4 w-4" />
             </Button>
-            {isAdmin ? (
+
+            {/* ONLY SHOW THE DELETE BUTTON FOR THE CARDS IN ADMIN ACCORDION, IF logged in user is a superuser 
+            AND IF user on the card is not a superuser */}
+
+            {/* isAdmin indicates if the UserCard is in the ADMIN ACCORDION!
+            HINT: Read isAdmin as isAdminAccordion !
+             */}  
+
+
+            {isAdmin ? SU && !user?.isSuperuser && (
               <Button variant="destructive" size="sm" onClick={() => onRevoke(user)} className="h-8 w-8 p-0">
                 <UserMinus className="h-4 w-4" />
               </Button>
@@ -217,6 +245,7 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
                 <Trash2 className="h-4 w-4" />
               </Button>
             )}
+
           </div>
         </div>
       </CardContent>
@@ -224,7 +253,11 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
   )
 
 
-  
+
+
+
+
+
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
@@ -313,13 +346,14 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
             <AccordionContent className="px-4 pb-4">
               <div className="space-y-3">
                 {filteredAdmins.length > 0 ? (
-                  filteredAdmins.map((admin,index) => (
+                  filteredAdmins.map((admin, index) => (
                     <UserCard
                       key={admin.id || index}
                       user={admin}
                       isAdmin={true}
                       onView={handleViewUser}
                       onRevoke={handleRevokeAdmin}
+
                     />
                   ))
                 ) : (
@@ -343,11 +377,11 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
                 <Badge variant="secondary">{filteredUsers.length}</Badge>
               </div>
             </AccordionTrigger>
-            <AccordionContent className="px-4 pb-4"> 
-         
+            <AccordionContent className="px-4 pb-4">
+
               <div className="space-y-3">
                 {filteredUsers.length > 0 ? (
-                  filteredUsers.map((user,index) => (
+                  filteredUsers.map((user, index) => (
                     <UserCard key={user.id || index} user={user} onView={handleViewUser} onDelete={handleDeleteUser} />
                   ))
                 ) : (
@@ -355,7 +389,7 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
                     {searchQuery ? "No users found matching your search." : "No users found."}
                   </p>
                 )}
-               
+
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -369,11 +403,19 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
             <DialogTitle className="flex items-center gap-2">
               User Details
               {selectedUser?.isAdmin && (
-                <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black animate-pulse">
+
+
+                selectedUser.isSuperuser ? (
+                  <Badge className="bg-gradient-to-r from-red-400 to-red-600 text-black animate-pulse">
+                    <Sparkles className="h-3 w-3 mr-1" />
+                    Superuser
+                  </Badge>
+                ) : <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black animate-pulse">
                   <Sparkles className="h-3 w-3 mr-1" />
                   Admin
                 </Badge>
               )}
+
             </DialogTitle>
           </DialogHeader>
           {selectedUser && (
@@ -456,8 +498,8 @@ export default function ManageUsersPage({ ALL_USERS = [] }) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
-      {showNotification && <AlertNotification message={`${deletedUserName} Deleted Successfully!`}/>}
+
+      {showNotification && <AlertNotification message={alertMessage} />}
     </div>
   )
 }
