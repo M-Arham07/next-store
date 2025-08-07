@@ -6,9 +6,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
 import { Line, LineChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
+import Link from "next/link"
 
 // Sample data
-const statsData = [
+
+export default function AdminDashboard({adminName = "",TOTAL_USERS,TOTAL_PRODUCTS}) {
+
+
+
+  const statsData = [
   {
     title: "Total Revenue",
     value: "$45,231.89",
@@ -19,7 +25,8 @@ const statsData = [
   },
   {
     title: "Total Users",
-    value: "2,350",
+    cardHref:'/admin/manage-users',
+    value: TOTAL_USERS,
     change: "+180.1%",
     changeType: "increase",
     icon: Users,
@@ -35,7 +42,7 @@ const statsData = [
   },
   {
     title: "Active Products",
-    value: "573",
+    value: TOTAL_PRODUCTS,
     change: "+201",
     changeType: "increase",
     icon: Package,
@@ -61,13 +68,32 @@ const topProducts = [
   { name: "Phone Case", sales: 432, revenue: "$8,640", progress: 33 },
 ]
 
-export default function AdminDashboard() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   const [timeRange, setTimeRange] = useState("7d")
 
   return (
     <div className="flex-1 space-y-4 p-4 pt-6 md:p-8">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+        <h2 className="text-3xl font-bold tracking-tight">Welcome {adminName.split(" ")[1]} !</h2>
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm">
             Download Report
@@ -78,8 +104,9 @@ export default function AdminDashboard() {
       {/* Stats Cards */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {statsData.map((stat, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <Link href={stat.cardHref || '#'} key={index}>
+          <Card className="dark:bg-gray-900 shadow-md hover:shadow-lg transition-shadow dark:border-0">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 ">
               <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
               <stat.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
@@ -98,12 +125,13 @@ export default function AdminDashboard() {
               </p>
             </CardContent>
           </Card>
+          </Link>
         ))}
       </div>
 
       <div className="grid gap-4 grid-cols-1 lg:grid-cols-7 w-full overflow-hidden">
         {/* Sales Chart */}
-        <Card className="lg:col-span-4 w-full">
+        <Card className="lg:col-span-4 w-full backdrop-blur-3xl dark:bg-black" >
           <CardHeader>
             <CardTitle>Sales Overview</CardTitle>
             <CardDescription>Monthly sales and orders for the current year</CardDescription>
@@ -270,7 +298,7 @@ export default function AdminDashboard() {
         </Card>
 
         {/* Top Products */}
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 dark:bg-black">
           <CardHeader>
             <CardTitle>Top Products</CardTitle>
             <CardDescription>Best performing products this month</CardDescription>

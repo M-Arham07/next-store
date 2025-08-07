@@ -27,7 +27,7 @@ import RevokeAdmin from "@/backend-utilities/revoke-admin/revoke-admin"
 
 
 
-let SUPERUSER_EMAIL = process.env.SUPERUSER_EMAIL;
+
 
 
 
@@ -57,8 +57,8 @@ const formatUser = (user) => {
     avatar: user.image || "/placeholder.svg",
     joinedAt: parseDate(user.createdAt),
     lastActive: parseDate(user.updatedAt),
-    isAdmin: user?.isAdmin || false,
-    isSuperuser: user?.isSuperuser || false
+    isAdmin: user?.role.includes("admin"),
+    isSuperuser: user?.role.includes("superuser")
   };
 };
 
@@ -71,7 +71,7 @@ export default function ManageUsersPage({ ALL_USERS = [], SU = false }) {
   const initialSeparatedUsers = ALL_USERS.reduce(
     (acc, user) => {
       const formattedUser = formatUser(user);
-      if (user?.isAdmin) {
+      if (["admin","superuser"].includes(user?.role)) {
         acc.admins.push(formattedUser);
       } else {
         acc.users.push(formattedUser);
@@ -403,17 +403,59 @@ export default function ManageUsersPage({ ALL_USERS = [], SU = false }) {
             <DialogTitle className="flex items-center gap-2">
               User Details
               {selectedUser?.isAdmin && (
-
-
                 selectedUser.isSuperuser ? (
-                  <Badge className="bg-gradient-to-r from-red-400 to-red-600 text-black animate-pulse">
-                    <Sparkles className="h-3 w-3 mr-1" />
-                    Superuser
+                  <Badge className="relative overflow-hidden bg-gradient-to-r from-red-500 via-rose-500 to-red-500 text-white font-bold px-3 py-1.5 shadow-lg shadow-red-500/30">
+                    <div className="absolute inset-0 sparkle-overlay"></div>
+                    <div className="relative flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      SUPERUSER
+                    </div>
+                    <style jsx>{`
+                      .sparkle-overlay {
+                        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                        transform: translateX(-100%);
+                        animation: shine 2s infinite;
+                      }
+                      @keyframes shine {
+                        100% { transform: translateX(100%); }
+                      }
+                      :global(.lucide-sparkles) {
+                        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                        color: rgba(255, 255, 200, 0.9);
+                      }
+                      @keyframes pulse {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.5; }
+                      }
+                    `}</style>
                   </Badge>
-                ) : <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black animate-pulse">
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  Admin
-                </Badge>
+                ) : (
+                  <Badge className="relative overflow-hidden bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 text-black font-bold px-3 py-1.5 shadow-lg shadow-amber-500/30">
+                    <div className="absolute inset-0 sparkle-overlay"></div>
+                    <div className="relative flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      ADMIN
+                    </div>
+                    <style jsx>{`
+                      .sparkle-overlay {
+                        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+                        transform: translateX(-100%);
+                        animation: shine 2s infinite;
+                      }
+                      @keyframes shine {
+                        100% { transform: translateX(100%); }
+                      }
+                      :global(.lucide-sparkles) {
+                        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+                        color: rgba(120, 53, 15, 0.9);
+                      }
+                      @keyframes pulse {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.5; }
+                      }
+                    `}</style>
+                  </Badge>
+                )
               )}
 
             </DialogTitle>

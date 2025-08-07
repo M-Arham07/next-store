@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth"
 import ConnectDB from "@/backend-utilities/ConnectDB";
 import Users from "@/backend-utilities/models/UserModel"
 import mongoose from "mongoose";
+import { revalidateTag } from "next/cache";
 
 
 export default async function RevokeAdmin(_id) {
@@ -24,18 +25,19 @@ export default async function RevokeAdmin(_id) {
         await ConnectDB();
 
         // CHECK IF CURRENT SESSION'S EMAIL IS A SUPERUSER
-        const requester = await Users.findOne({email: session?.user?.email}).lean();
+        const requester = await Users.findOne({email: session?.user?.email});
   
 
-        if (!requester?.isSuperuser) throw new Error(`${session?.user?.email} is not a superuser! Access denied`);
+        if (requester?.role !== 'superuser') throw new Error(`${session?.user?.email} is not a superuser! Access denied`);
 
         // ABOVE CHECK PASSED, NOW REVOKE ACCESS FOR THE REQUESTED ADMIN!
         const revokedAdmin = await Users.findByIdAndUpdate(
             { _id: _id },
-            { $set: { isAdmin: false } },
+            { $set: { role:'user' } },
             { new: true }
         );
         console.log("Revoked Admin Access for", revokedAdmin?.email);
+        revalidateTag('users'); // refresh cache!
 
         return true;
 

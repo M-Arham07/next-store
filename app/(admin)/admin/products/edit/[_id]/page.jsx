@@ -1,4 +1,4 @@
-import getProductById from "@/backend-utilities/getProductById";
+import getProductById from "@/backend-utilities/GetProductById";
 import EditProductPage from "@/components/admin/edit-productpage/edit-product-page";
 import UnavailableProduct from "@/components/productinfo-page/unavailable-product";
 

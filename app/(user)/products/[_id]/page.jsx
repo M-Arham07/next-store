@@ -2,7 +2,7 @@ import ProductInfoPage from "@/components/productinfo-page/product-info";
 import GetProducts from "@/backend-utilities/GetProducts";
 import UnavailableProduct from "@/components/productinfo-page/unavailable-product";
 import Products from "@/backend-utilities/models/ProductModel";
-import getProductById from "@/backend-utilities/getProductById";
+import getProductById from "@/backend-utilities/GetProductById";
 
 
 

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+
 
 
 export default async function middleware(request) {
@@ -102,24 +102,39 @@ export default async function middleware(request) {
 </html>`
 
     try {
+        // VERIFY ADMIN BY SENDING GET REQUEST TO API:
 
-        const secret = process.env.NEXTAUTH_SECRET;
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/verify-admin`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "cookie": request.headers.get("cookie") || "", // forward session cookie to access getServerSession on route!
+            }
+        });
 
-        const token = await getToken({ req: request, secret });
-        console.log("RECEIVED TOKEN:", token || "No token")
+        if(!res.ok){
+            throw new Error("Received Bad response from API! Admin access denied!")
+        }
 
-        if (!token) throw new Error("No token found!");
 
-        if (!token.isAdmin) throw new Error(`${token.email} is not an admin!`);
+        const data = await res.json();
+        const {role,email} = data;
+
 
         // IF ALL ABOVE CHECKS ARE PASSED, MEANS USER IS ADMIN SO ALLOW ADMIN ROUTE!
-        console.log("WELCOME TO ADMIN MODE", token.email);
+
+        // THIS ESCAPE SEQUENCE MAKES TEXT GREEN!:
+        console.log(`\x1b[32m${role.toUpperCase()} access granted to ${email}\x1b[0m`); 
+
+        // CONTINUE TO ADMIN ROUTE:
         return NextResponse.next();
 
 
     }
     catch (err) {
-        console.error("Admin verification failed at middleware! Logs:", err?.message);
+       
+        // COOL RED ERROR:
+        console.error(`\x1b[31m Admin verification failed at middleware! Logs:, ${err?.message} \x1b[0m`);
 
         return new NextResponse(forbidden_html_page, {
             status: 403,

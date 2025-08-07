@@ -21,9 +21,11 @@ const userSchema = new Schema({
         // MEANS CART CAN STORE ANY VALUE (CUZ I DONT WANT TO DEFINE ANOTHER BIG SCHEMA)
         default:[] //sets a default empty array for cart
     },
-    isAdmin:{
-        type:Boolean, // FOR CHECKING IF USER ADMIN OR NOT, DEFAULT IS FALSE!
-        default:false
+    role:{
+        type:String,
+        enum: ['user','admin','superuser'],
+        required:true,
+        default:'user'
     }
 
 },{collection:"users",timestamps:true});

@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import Users from "@/backend-utilities/models/UserModel";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import GetAllUsers from "@/backend-utilities/GetAllUsers";
 
 
 
@@ -11,18 +12,15 @@ export default async function MANAGE_USERS_PAGE() {
 
   const session = await getServerSession(authOptions);
 
-
-  await ConnectDB();
-  const rawUsers = await Users.find().lean();
-  const parsedUsers = JSON.parse(JSON.stringify(rawUsers));
-
+  const allUsers = await GetAllUsers();
+  
   // TO FIND SUPERUSER:
-  // console.log("RECEIEVD SU:",parsedUsers.filter(user=>user.isSuperuser === true))
-
- 
-  const isSU = parsedUsers.some(user=>user?.isSuperuser && user?.email === session?.user?.email);
+  // console.log("RECEIEVD SU:",allUsers.filter(user=>user.isSuperuser === true))
 
 
+  const isSU = allUsers.some(user => session.user.email === user.email && user.role === 'superuser');
 
-  return <ManageUsersPage ALL_USERS={parsedUsers} SU={isSU} />
+
+
+  return <ManageUsersPage ALL_USERS={allUsers || []} SU={isSU} />
 }
