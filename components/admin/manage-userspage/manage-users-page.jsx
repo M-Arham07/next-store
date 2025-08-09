@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
-import { Eye, Trash2, UserMinus, Sparkles, Search } from "lucide-react"
+import { Eye, Trash2, UserMinus, Sparkles, Search, Crown, Users } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import DeleteUser from "@/backend-utilities/delete-user/DeleteUser";
@@ -407,7 +407,7 @@ export default function ManageUsersPage({ ALL_USERS = [], SU = false }) {
                   <Badge className="relative overflow-hidden bg-gradient-to-r from-red-500 via-rose-500 to-red-500 text-white font-bold px-3 py-1.5 shadow-lg shadow-red-500/30">
                     <div className="absolute inset-0 sparkle-overlay"></div>
                     <div className="relative flex items-center gap-1.5">
-                      <Sparkles className="h-3.5 w-3.5" />
+                      <Crown className="h-3.5 w-3.5" />
                       SUPERUSER
                     </div>
                     <style jsx>{`
@@ -433,7 +433,7 @@ export default function ManageUsersPage({ ALL_USERS = [], SU = false }) {
                   <Badge className="relative overflow-hidden bg-gradient-to-r from-amber-400 via-yellow-500 to-amber-400 text-black font-bold px-3 py-1.5 shadow-lg shadow-amber-500/30">
                     <div className="absolute inset-0 sparkle-overlay"></div>
                     <div className="relative flex items-center gap-1.5">
-                      <Sparkles className="h-3.5 w-3.5" />
+                      <Users className="h-3.5 w-3.5" />
                       ADMIN
                     </div>
                     <style jsx>{`

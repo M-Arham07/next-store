@@ -77,7 +77,7 @@ export default function ModernNavbar() {
         <div className="flex items-center flex-1 justify-center">
           <div className="flex items-center space-x-3">
             <div className="relative h-9 w-9 rounded-xl overflow-hidden ring-2 ring-primary/20">
-              <Image src="/brand.png" alt="O2 Store Logo" width={36} height={36} className="object-cover" priority />
+              <Image src="/brand.png" alt="O2 Store Logo" width={36} height={36} className="object-cover rounded-full" priority />
             </div>
             <span className="hidden text-xl font-bold tracking-tight sm:inline-block">O2 Store</span>
             <span className="ml-0 text-lg font-bold tracking-tight md:hidden">O2 Store</span>

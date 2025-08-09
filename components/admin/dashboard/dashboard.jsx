@@ -10,63 +10,72 @@ import Link from "next/link"
 
 // Sample data
 
-export default function AdminDashboard({adminName = "",TOTAL_USERS,TOTAL_PRODUCTS}) {
+
+
+export default function AdminDashboard({
+  adminName = "",
+  STATS: { TOTAL_USERS, TOTAL_PRODUCTS, ProdChange }
+
+
+}) {
 
 
 
   const statsData = [
-  {
-    title: "Total Revenue",
-    value: "$45,231.89",
-    change: "+20.1%",
-    changeType: "increase",
-    icon: DollarSign,
-    description: "from last month",
-  },
-  {
-    title: "Total Users",
-    cardHref:'/admin/manage-users',
-    value: TOTAL_USERS,
-    change: "+180.1%",
-    changeType: "increase",
-    icon: Users,
-    description: "from last month",
-  },
-  {
-    title: "Total Orders",
-    value: "12,234",
-    change: "+19%",
-    changeType: "increase",
-    icon: ShoppingCart,
-    description: "from last month",
-  },
-  {
-    title: "Active Products",
-    value: TOTAL_PRODUCTS,
-    change: "+201",
-    changeType: "increase",
-    icon: Package,
-    description: "from last month",
-  },
-]
+    {
+      title: "Total Revenue",
+      value: "$45,231.89",
+      change: "+20.1%",
+      changeType: "increase",
+      icon: DollarSign,
+      description: "from last month",
+    },
+    {
+      title: "Total Users",
+      cardHref: '/admin/manage-users',
+      value: TOTAL_USERS,
+      change: "+180.1%",
+      changeType: "increase",
+      icon: Users,
+      description: "from last month",
+    },
+    {
+      title: "Total Orders",
+      cardHref: "/admin/orders",
+      value: "12,234",
+      change: "+19%",
+      changeType: "increase",
+      icon: ShoppingCart,
+      description: "from last month",
+    },
+    {
+      title: "Active Products",
+      cardHref: "/admin/products",
+      value: TOTAL_PRODUCTS,
+      change: ProdChange,
+      changeType: ProdChange >= 0 ? "increase" : "decrease",
+      icon: Package,
+      description: `${ProdChange > 0 ? "Increase" : "Decrease"} from last month`,
+    },
+  ]
 
-const salesData = [
-  { month: "Jan", sales: 4000, orders: 240 },
-  { month: "Feb", sales: 3000, orders: 139 },
-  { month: "Mar", sales: 2000, orders: 980 },
-  { month: "Apr", sales: 2780, orders: 390 },
-  { month: "May", sales: 1890, orders: 480 },
-  { month: "Jun", sales: 2390, orders: 380 },
-  { month: "Jul", sales: 3490, orders: 430 },
-]
+  const salesData = [
+    { month: "Jan", sales: 4000, orders: 240 },
+    { month: "Feb", sales: 3000, orders: 139 },
+    { month: "Mar", sales: 2000, orders: 980 },
+    { month: "Apr", sales: 2780, orders: 390 },
+    { month: "May", sales: 1890, orders: 480 },
+    { month: "Jun", sales: 2390, orders: 380 },
+    { month: "Jul", sales: 3490, orders: 430 },
+  ]
 
-const topProducts = [
-  { name: "Wireless Headphones", sales: 1234, revenue: "$24,680", progress: 85 },
-  { name: "Smart Watch", sales: 987, revenue: "$19,740", progress: 72 },
-  { name: "Laptop Stand", sales: 756, revenue: "$15,120", progress: 58 },
-  { name: "USB-C Cable", sales: 543, revenue: "$10,860", progress: 41 },
-  { name: "Phone Case", sales: 432, revenue: "$8,640", progress: 33 },
-]
+  const topProducts = [
+    { name: "Wireless Headphones", sales: 1234, revenue: "$24,680", progress: 85 },
+    { name: "Smart Watch", sales: 987, revenue: "$19,740", progress: 72 },
+    { name: "Laptop Stand", sales: 756, revenue: "$15,120", progress: 58 },
+    { name: "USB-C Cable", sales: 543, revenue: "$10,860", progress: 41 },
+    { name: "Phone Case", sales: 432, revenue: "$8,640", progress: 33 },
+  ]
 
 
 
@@ -105,26 +114,26 @@ const topProducts = [
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {statsData.map((stat, index) => (
           <Link href={stat.cardHref || '#'} key={index}>
-          <Card className="dark:bg-gray-900 shadow-md hover:shadow-lg transition-shadow dark:border-0">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 ">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground flex items-center">
-                {stat.changeType === "increase" ? (
-                  <ArrowUpRight className="h-3 w-3 text-green-500 mr-1" />
-                ) : (
-                  <ArrowDownRight className="h-3 w-3 text-red-500 mr-1" />
-                )}
-                <span className={stat.changeType === "increase" ? "text-green-500" : "text-red-500"}>
-                  {stat.change}
-                </span>
-                <span className="ml-1">{stat.description}</span>
-              </p>
-            </CardContent>
-          </Card>
+            <Card className="dark:bg-gray-900 shadow-md hover:shadow-lg transition-shadow dark:border-0">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 ">
+                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                <stat.icon className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stat.value}</div>
+                <p className="text-xs text-muted-foreground flex items-center">
+                  {stat.changeType === "increase" ? (
+                    <ArrowUpRight className="h-3 w-3 text-green-500 mr-1" />
+                  ) : (
+                    <ArrowDownRight className="h-3 w-3 text-red-500 mr-1" />
+                  )}
+                  <span className={stat.changeType === "increase" ? "text-green-500" : "text-red-500"}>
+                    {stat.change}
+                  </span>
+                  <span className="ml-1">{stat.description}</span>
+                </p>
+              </CardContent>
+            </Card>
           </Link>
         ))}
       </div>

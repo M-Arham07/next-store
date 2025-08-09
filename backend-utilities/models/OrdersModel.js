@@ -1,0 +1,84 @@
+
+import mongoose from "mongoose";
+const Schema = mongoose.Schema;
+
+const OrdersSchema = new Schema({
+    orderId: {
+        type: String,
+        required: true,
+        unique: true
+    },
+
+    // CUSTOMER DETAILS:
+
+    customerDetails: {
+
+        name: { type: String, required: true },
+        email: { type: String, required: true },
+        phone: { type: String, required: true }
+
+    },
+
+    
+   // DELIVERY DETAILS + ADDRESS:
+
+    deliveryDetails: {
+        address: { type: String, required: true },
+        streetAddress: { type: String },
+        landmark: { type: String },
+        instructions: { type: String },
+        coordinates: {
+            lat: { type: Number, required: true },
+            lon: { type: Number, required: true }
+        },
+        googleMapsUrl: { type: String, required: true }
+
+    },
+
+    // PAYMENT METHOD AND COD SURCHARGE!:
+
+    paymentDetails: {
+        method: { type: String, required: true },
+        codSurcharge: { type: Number }
+    },
+
+
+    // ORDERED ITEMS!:
+
+    orderedItems: {     // An array of ids of ordered products!
+        type: [String],
+        required: true
+    },
+
+    // PRICING, TOTAL AND DISCOUNT!
+
+    pricing: {
+        subtotal: { type: Number, required: true },
+        deliveryFee: { type: Number, required: true },
+        discount: {
+            promoCode: { type: String },
+            percentage: { type: Number },
+            discountedAmount: { type: Number }
+        },
+        codSurcharge: { type: Number },
+        total: { type: Number }
+    },
+
+    // CURRENT ORDER STATUS - FOR TRACKING:
+    
+    status: {
+        type: String,
+        required: true,
+        enum: ["processing", "confirmed", "shipped", "out for delivery", "delivered"],
+        default: "processing"
+
+
+
+
+    }
+
+
+}, { collection: "orders", timestamps: true });
+
+export default mongoose.models.Orders || mongoose.model("Orders", OrdersSchema);
+

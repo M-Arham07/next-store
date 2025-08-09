@@ -25,17 +25,50 @@ export default async function ADMIN_DASHBOARD() {
     
     
 
-    const THIS_MONTH_PRODUCTS = allProducts.filter(product=>(
-        (new Date(product.createdAt)).getMonth() + 1 === (new Date).getMonth() + 1
-    ))
+    
+       // FILTER ALL THOSE PRODUCTS THAT WERE ADDED THIS MONTH (ALSO VERIFY YEAR)
 
-    // ProdIncrease == products added in this month
-    // const ProdIncrease = allProd
+       const now = new Date();
+       const productsAddedThisMonth = allProducts.filter(product=>{
+         const prodCreation = new Date(product.createdAt);
+         return (
+            prodCreation.getMonth() === now.getMonth() &&
+            prodCreation.getFullYear() === now.getFullYear()
+
+         )
+
+       })
+
+       // THIS HANDLES CASES WHEN CURRENT MONTH JANUARY:
+
+       const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+       const productsAddedLastMonth = allProducts.filter(product=>{
+        const prodCreation = new Date(product.createdAt);
+        return (
+            prodCreation.getMonth() === lastMonth.getMonth() &&
+            prodCreation.getFullYear() === lastMonth.getFullYear()
+        )
+
+       })
+
+  
+    console.log("PRODUCTS ADDED THIS MONTH:",productsAddedThisMonth.length)
+
+                       
+    // ProdChange==  (products added this month) - (products added in last month )
+  
+
+    const STATS = {
+
+        TOTAL_USERS : allUsers.length ?? "No Data. Please reload the page",
+        TOTAL_PRODUCTS : allProducts.length ?? "No Data. Please reload the page",
+        ProdChange :productsAddedThisMonth.length - productsAddedLastMonth.length
+    }
 
 
     return <AdminDashboard
         adminName={session.user.name}
-        TOTAL_USERS={allUsers.length ?? "No Data. Please reload the page"}
-        TOTAL_PRODUCTS={allProducts.length ?? "No data. Please reloas the page"}
+        STATS = {STATS}
     />
 }

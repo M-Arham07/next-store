@@ -8,11 +8,7 @@ import { useState, useEffect } from "react"
 export default function useCart() {
   const [cartItems, setCartItems] = useState([]);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [promoCode, setPromoCode] = useState("");
-  const [promoApplied, setPromoApplied] = useState(false);
-  const [promoError, setPromoError] = useState("");
-  const [promoDialogOpen, setPromoDialogOpen] = useState(false);
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+
 
   const { data: session } = useSession();
 
@@ -59,18 +55,8 @@ export default function useCart() {
         }
       }
       syncCart();
-      // Load promo state from localStorage
-      const savedPromoCode = localStorage.getItem("promoCode")
-      const savedPromoApplied = localStorage.getItem("promoApplied")
-
-
-      if (savedPromoCode) {
-        setPromoCode(savedPromoCode)
-      }
-
-      if (savedPromoApplied === "true") {
-        setPromoApplied(true)
-      }
+      
+     
     } catch (err) {
       console.log("Error initializing cart from localStorage:", err)
       setCartItems([])
@@ -80,13 +66,11 @@ export default function useCart() {
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem("cart", JSON.stringify(cartItems))
-      // Save promo state to localStorage
-      localStorage.setItem("promoCode", promoCode)
-      localStorage.setItem("promoApplied", promoApplied.toString())
+
     }
 
     if (session?.user) SaveCartToDB(session?.user?.email, cartItems)
-  }, [cartItems, promoCode, promoApplied, isInitialized])
+  }, [cartItems, isInitialized])
 
   const addItem = (currentProduct) => {
     const isExist = cartItems.some((product) => currentProduct._id === product._id)
@@ -117,45 +101,20 @@ export default function useCart() {
 
   const clearCart = () => {
     setCartItems([])
-    setPromoCode("")
-    setPromoApplied(false)
     localStorage.removeItem("cart")
-    localStorage.removeItem("promoCode")
-    localStorage.removeItem("promoApplied")
+ 
   }
 
   const allSelected = cartItems.every((item) => item.selected)
   const selectedItems = cartItems.filter((item) => item.selected)
   const isEmpty = cartItems?.length === 0
 
-  const applyPromoCode = () => {
-    setIsApplyingPromo(true)
-    setPromoError("")
-
-    setTimeout(() => {
-      if (promoCode.toLowerCase() === "yellowchick") {
-        setPromoApplied(true)
-        setPromoDialogOpen(false)
-        setPromoError("")
-      } else {
-        setPromoError("Invalid promo code. Please try again.")
-      }
-      setIsApplyingPromo(false)
-    }, 2000)
-  }
-
-  const removePromoCode = () => {
-    console.log("PROMOCODE WAS ", promoCode)
-    setPromoCode("")
-    setPromoApplied(false)
-    setPromoError("")
-  }
+  
+ 
 
   const subtotal = selectedItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const deliveryFee = 4.9
-  const discountPercent = promoApplied ? 20 : 0
-  const discount = subtotal * (discountPercent / 100)
-  const total = subtotal + deliveryFee - discount
+  const total = subtotal + deliveryFee
 
   return {
     cartItems,
@@ -169,21 +128,8 @@ export default function useCart() {
     selectedItems,
     subtotal,
     deliveryFee,
-    discountPercent,
-    discount,
     total,
-    promoApplied,
-    promoCode,
-    promoError,
-    applyPromoCode,
-    setPromoCode,
-    setPromoApplied,
-    removePromoCode,
-    setPromoError,
-    setIsApplyingPromo,
-    isApplyingPromo,
-    promoDialogOpen,
-    setPromoDialogOpen,
+  
     clearCart, // Expose clearCart
   }
 }

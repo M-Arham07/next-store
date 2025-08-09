@@ -1,15 +1,17 @@
 "use client"
 
-import { useState, useEffect, useRef,useContext } from "react"
+import { useState, useEffect, useRef, useContext } from "react"
 import { useRouter } from "next/navigation"
 import { z } from "zod"
 import { CartContext } from "@/contexts/CartProvider"
+import VerifyPromoCode from "@/backend-utilities/promo-related/VerifyPromo"
+import ConfirmOrder from "@/backend-utilities/confirm-order/ConfirmOrder"
 
 // Zod schema for email validation
 const emailSchema = z.string().email("Invalid email address.")
 
 export default function useCheckout() {
-  const { selectedItems, subtotal, deliveryFee, discount, promoApplied, discountPercent, clearCart } = useContext(CartContext)
+  const { selectedItems, subtotal, deliveryFee, clearCart } = useContext(CartContext)
   const router = useRouter()
 
   const [customerName, setCustomerName] = useState("")
@@ -32,6 +34,55 @@ export default function useCheckout() {
   const [searchTimeout, setSearchTimeout] = useState(null)
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
 
+  // Error Modal:
+  const [errModalOpen, setErrModalOpen] = useState(false);
+
+
+
+
+
+  // PROMO CODE::
+  const [promoCode, setPromoCode] = useState("");
+  const [promoApplied, setPromoApplied] = useState(false);
+  const [promoError, setPromoError] = useState("");
+  const [promoDialogOpen, setPromoDialogOpen] = useState(false);
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+
+
+
+
+
+  const [discountPercentage, setDiscountPercentage] = useState(0);
+
+  const applyPromoCode = async () => {
+    setIsApplyingPromo(true);
+    setPromoError("");
+
+    const Verified = await VerifyPromoCode(promoCode);
+
+    if (!Verified.success) {
+      setPromoError("Invalid promo code. Please try again.")
+    }
+    else {
+      setPromoApplied(true);
+      setPromoDialogOpen(false);
+      setPromoError("");
+      setDiscountPercentage(Verified.discountPercentage);
+      console.log("Discount is", discountPercentage);
+
+    }
+    setIsApplyingPromo(false);
+  }
+
+
+  const removePromoCode = () => {
+    setPromoCode("")
+    setPromoApplied(false)
+    setPromoError("")
+  }
+
+
+
   const addressInputRef = useRef(null)
   const suggestionsRef = useRef(null)
 
@@ -39,7 +90,8 @@ export default function useCheckout() {
   const codSurcharge = paymentMethod === "cod" ? 1 : 0
 
   // Calculate total
-  const total = subtotal + deliveryFee - discount + codSurcharge
+
+  const total = subtotal + deliveryFee - (subtotal * (discountPercentage / 100)) + codSurcharge
 
   // Validation functions
   const validateName = (name) => name.trim().length >= 3
@@ -241,16 +293,71 @@ export default function useCheckout() {
     setIsProcessing(true)
     setShowConfirmationDialog(false)
 
-    const orderId = Math.floor(1000000000000 + Math.random() * 9000000000000).toString()
 
-    //API CALL:
 
-    setTimeout(() => {
-      router.push(`/checkout/confirmed/${orderId}`);
+    // Pack all order details into an object!
+
+    const orderDetails = {
+
+      customerDetails: {
+        name: customerName,
+        email: emailAddress,
+        phone: mobileNumber,
+      },
+      deliveryDetails: {
+        address: confirmedAddress.display_name,
+        streetAddress,
+        landmark,
+        instructions: deliveryInstructions,
+        coordinates: {
+          lat: confirmedAddress.lat,
+          lon: confirmedAddress.lon
+        },
+        googleMapsUrl: `https://www.google.com/maps?q=${confirmedAddress.lat},${confirmedAddress.lon}`
+      },
+      paymentDetails: {
+        method: paymentMethod,
+        codSurcharge: codSurcharge
+      },
+      orderedItems: selectedItems.map(item => item._id),
+      pricing: {
+        subtotal,
+        deliveryFee,
+        discount: {
+          promoCode: promoApplied ? promoCode : null,
+          percentage: discountPercentage,
+          discountedAmount: (subtotal * (discountPercentage / 100))
+        },
+        codSurcharge,
+        total
+      }
+    };
+
+
+    // Call Server action to confirm order:
+
+    const ConfirmedOrder = await ConfirmOrder(orderDetails);
+
+    // if order not confirmed:
+    if (!ConfirmedOrder) {
       setIsProcessing(false);
-       clearCart();
-    }, 2000);
-    
+      // Show error modal:
+      setErrModalOpen(true);
+      return false;
+
+    }
+
+    const { orderId } = ConfirmedOrder;
+
+
+    router.push(`/checkout/confirmed/${orderId}`);
+    clearCart();
+
+    setIsProcessing(false);
+    return true; 
+
+
+
   }
 
   const handleRemoveAddress = () => {
@@ -261,6 +368,8 @@ export default function useCheckout() {
     setDeliveryInstructions("")
     setLocationError("")
   }
+
+  
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -274,8 +383,8 @@ export default function useCheckout() {
       }
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
+    window.addEventListener("mousedown", handleClickOutside)
+    return () => window.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
   useEffect(() => {
@@ -317,15 +426,25 @@ export default function useCheckout() {
     addressInputRef,
     suggestionsRef,
 
+
+    // PROMOS: 
+    promoCode, setPromoCode,
+    promoApplied, setPromoApplied,
+    promoError, setPromoError,
+    promoDialogOpen, setPromoDialogOpen,
+    isApplyingPromo, setIsApplyingPromo, removePromoCode,
+    applyPromoCode,
+
+
+
     // Derived values
     codSurcharge,
     total,
     selectedItems,
     subtotal,
     deliveryFee,
-    discount,
-    promoApplied,
-    discountPercent,
+    discountPercentage,
+
 
     // Functions
     validateName,
@@ -336,5 +455,8 @@ export default function useCheckout() {
     handleOrderNow,
     handleConfirmOrder,
     handleRemoveAddress,
+
+    //ERR MODAL:
+    errModalOpen, setErrModalOpen
   }
 }

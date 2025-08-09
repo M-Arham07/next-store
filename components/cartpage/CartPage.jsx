@@ -26,14 +26,7 @@ export default function CartPage() {
         selectedItems,
         subtotal,
         deliveryFee,
-        discountPercent,
-        removePromoCode,
-        discount,
         total,
-        promoApplied,
-        promoCode,
-        promoError,applyPromoCode,setPromoCode,setPromoApplied,setPromoError,
-        setIsApplyingPromo,isApplyingPromo,promoDialogOpen,setPromoDialogOpen
     } = useContext(CartContext);
 
 
@@ -160,7 +153,7 @@ export default function CartPage() {
                             </div>
 
                             {/* Mobile Promo Code Button - Only show if cart has items */}
-                            {!isEmpty && (
+                            {/* {!isEmpty && (
                                 <div className="mt-6 mx-1">
                                     {promoApplied ? (
                                         <div className="bg-green-50 backdrop-blur-sm border border-green-200 rounded-2xl p-4 shadow-lg">
@@ -230,7 +223,7 @@ export default function CartPage() {
                                         </Dialog>
                                     )}
                                 </div>
-                            )}
+                            )} */}
                         </div>
 
                         {/* Desktop Table Layout */}
@@ -367,16 +360,16 @@ export default function CartPage() {
                                             <span>Delivery Fee:</span>
                                             <span>${deliveryFee.toFixed(2)}</span>
                                         </div>
-                                        {promoApplied && (
+                                        {/* {promoApplied && (
                                             <div className="flex justify-between text-green-600">
                                                 <span>Discount:</span>
                                                 <span>-${discount.toFixed(2)}</span>
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
 
                                     {/* Promo Code - Desktop */}
-                                    <div className="mb-6">
+                                    {/* <div className="mb-6">
                                         <label className="block text-muted-foreground text-sm font-medium mb-2">PROMO CODE</label>
                                         {promoApplied ? (
                                             <div className="bg-green-50 border border-green-200 rounded-lg p-3">
@@ -425,7 +418,7 @@ export default function CartPage() {
                                                 {promoError && <p className="text-destructive text-sm mt-2">{promoError}</p>}
                                             </>
                                         )}
-                                    </div>
+                                    </div> */}
 
                                     {/* Total */}
                                     <div className="border-t pt-4 mb-6">
@@ -459,12 +452,12 @@ export default function CartPage() {
                                 <span>Delivery Fee:</span>
                                 <span>${deliveryFee.toFixed(2)}</span>
                             </div>
-                            {promoApplied && (
+                            {/* {promoApplied && (
                                 <div className="flex justify-between text-green-600">
                                     <span>Discount:</span>
                                     <span>-${discount.toFixed(2)}</span>
                                 </div>
-                            )}
+                            )} */}
                         </div>
 
                         {/* Total */}
