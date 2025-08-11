@@ -38,7 +38,7 @@ import useCheckout from "@/hooks/useCheckout"
 import { useEffect } from "react"
 import ProgressModal from "@/components/ProgressModal"
 
-export default function CheckoutPage() {
+export default function CheckoutPage({session}) {
   const router = useRouter()
   const {
     // State
@@ -47,8 +47,6 @@ export default function CheckoutPage() {
     displayMobileNumber,
     handleMobileNumberChange,
     mobileNumber,
-    emailAddress,
-    setEmailAddress,
     addressInput,
     handleAddressInputChange,
     confirmedAddress,
@@ -230,24 +228,6 @@ export default function CheckoutPage() {
                       <p className="text-destructive text-xs">
                         Please enter a valid Pakistani mobile number (e.g., +923XX-XXXXXXX, max 15 digits).
                       </p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email-address" className="text-sm">
-                      Email Address
-                    </Label>
-                    <Input
-                      id="email-address"
-                      type="email"
-                      placeholder="Enter your email address"
-                      value={emailAddress}
-                      onChange={(e) => setEmailAddress(e.target.value)}
-                      required
-                      className={!validateEmail(emailAddress) && emailAddress.length > 0 ? "border-destructive" : ""}
-                    />
-                    {!validateEmail(emailAddress) && emailAddress.length > 0 && (
-                      <p className="text-destructive text-xs">Please enter a valid email address.</p>
                     )}
                   </div>
                 </CardContent>
@@ -703,8 +683,7 @@ export default function CheckoutPage() {
                   isProcessing ||
                   !confirmedAddress ||
                   !validateName(customerName) ||
-                  !validateMobileNumber(mobileNumber) ||
-                  !validateEmail(emailAddress)
+                  !validateMobileNumber(mobileNumber)
                 }
                 className="w-full h-12 text-base font-semibold"
               >
@@ -722,8 +701,7 @@ export default function CheckoutPage() {
               isProcessing ||
               !confirmedAddress ||
               !validateName(customerName) ||
-              !validateMobileNumber(mobileNumber) ||
-              !validateEmail(emailAddress)
+              !validateMobileNumber(mobileNumber)
             }
             className="w-full h-14 text-lg font-semibold"
           >
@@ -749,10 +727,6 @@ export default function CheckoutPage() {
               <div className="grid grid-cols-3 items-center gap-4">
                 <span className="text-muted-foreground">Mobile:</span>
                 <span className="col-span-2 font-medium">{mobileNumber}</span>
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <span className="text-muted-foreground">Email:</span>
-                <span className="col-span-2 font-medium">{emailAddress}</span>
               </div>
 
               <Separator className="my-2" />
@@ -813,7 +787,7 @@ export default function CheckoutPage() {
               <Button variant="outline" onClick={() => setShowConfirmationDialog(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleConfirmOrder} disabled={isProcessing}>
+              <Button onClick={()=>handleConfirmOrder(session.user.email)} disabled={isProcessing}>
                 {isProcessing ? "Confirming..." : "Confirm Order"}
               </Button>
             </DialogFooter>
@@ -831,3 +805,4 @@ export default function CheckoutPage() {
     </>
   )
 }
+

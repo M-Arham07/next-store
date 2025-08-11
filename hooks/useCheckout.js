@@ -2,13 +2,9 @@
 
 import { useState, useEffect, useRef, useContext } from "react"
 import { useRouter } from "next/navigation"
-import { z } from "zod"
 import { CartContext } from "@/contexts/CartProvider"
 import VerifyPromoCode from "@/backend-utilities/promo-related/VerifyPromo"
 import ConfirmOrder from "@/backend-utilities/confirm-order/ConfirmOrder"
-
-// Zod schema for email validation
-const emailSchema = z.string().email("Invalid email address.")
 
 export default function useCheckout() {
   const { selectedItems, subtotal, deliveryFee, clearCart } = useContext(CartContext)
@@ -17,8 +13,6 @@ export default function useCheckout() {
   const [customerName, setCustomerName] = useState("")
   const [displayMobileNumber, setDisplayMobileNumber] = useState("+92")
   const [mobileNumber, setMobileNumber] = useState("+92")
-  const [emailAddress, setEmailAddress] = useState("")
-
   const [addressInput, setAddressInput] = useState("")
   const [confirmedAddress, setConfirmedAddress] = useState(null)
   const [streetAddress, setStreetAddress] = useState("")
@@ -95,7 +89,6 @@ export default function useCheckout() {
 
   // Validation functions
   const validateName = (name) => name.trim().length >= 3
-  const validateEmail = (email) => emailSchema.safeParse(email).success
   const validateMobileNumber = (number) => {
     const strippedNumber = number.replace(/^\+92/, "")
     return number.startsWith("+92") && strippedNumber.length >= 10 && strippedNumber.length <= 13
@@ -277,10 +270,6 @@ export default function useCheckout() {
       setLocationError("Please enter a valid Pakistani mobile number (e.g., +923XX-XXXXXXX, max 15 digits).")
       return
     }
-    if (!validateEmail(emailAddress)) {
-      setLocationError("Please enter a valid email address.")
-      return
-    }
     if (!confirmedAddress) {
       setLocationError("Please select a delivery address from the suggestions or use your current location.")
       return
@@ -289,7 +278,7 @@ export default function useCheckout() {
     setShowConfirmationDialog(true)
   }
 
-  const handleConfirmOrder = async () => {
+  const handleConfirmOrder = async (session_email) => {
     setIsProcessing(true)
     setShowConfirmationDialog(false)
 
@@ -298,10 +287,9 @@ export default function useCheckout() {
     // Pack all order details into an object!
 
     const orderDetails = {
-
       customerDetails: {
         name: customerName,
-        email: emailAddress,
+        email: session_email,
         phone: mobileNumber,
       },
       deliveryDetails: {
@@ -402,8 +390,6 @@ export default function useCheckout() {
     displayMobileNumber,
     handleMobileNumberChange,
     mobileNumber,
-    emailAddress,
-    setEmailAddress,
     addressInput,
     handleAddressInputChange,
     confirmedAddress,
@@ -448,7 +434,6 @@ export default function useCheckout() {
 
     // Functions
     validateName,
-    validateEmail,
     validateMobileNumber,
     handleSuggestionSelect,
     getCurrentLocation,

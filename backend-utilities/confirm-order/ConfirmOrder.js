@@ -4,6 +4,7 @@ import ConnectDB from "@/backend-utilities/ConnectDB";
 import Orders from "@/backend-utilities/models/OrdersModel";
 import VerifyPromoCode from "@/backend-utilities/promo-related/VerifyPromo";
 import DecLeftUses from "@/backend-utilities/promo-related/DecLeftUses";
+import { revalidateTag } from "next/cache";
 
 export default async function ConfirmOrder(orderDetails) {
 
@@ -59,8 +60,8 @@ export default async function ConfirmOrder(orderDetails) {
 
         await Orders.create({ orderId, ...orderDetails, status: 'processing' });
 
-
-
+        // Refresh cache for orders!
+        revalidateTag('orders');
 
         return {
             success: true,

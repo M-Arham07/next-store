@@ -14,5 +14,5 @@ export default async function CHECKOUT_PAGE(){
 
   }
 
-  return <CheckoutPage SESSION_INFO = {session} />
+  return <CheckoutPage session = {session} />
 }

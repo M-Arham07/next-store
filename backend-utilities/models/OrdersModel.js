@@ -45,9 +45,13 @@ const OrdersSchema = new Schema({
 
     // ORDERED ITEMS!:
 
-    orderedItems: {     // An array of ids of ordered products!
-        type: [String],
-        required: true
+    orderedItems: {     
+        type: [mongoose.Types.ObjectId], //Array of object Ids!
+        required: true,
+        ref:'Product', // reference to Product (products) collection
+
+        // We can populate orderedItems before  showing results on Orders page, to also get all products!
+        
     },
 
     // PRICING, TOTAL AND DISCOUNT!
