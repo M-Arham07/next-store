@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { type } from "os";
 const Schema=mongoose.Schema;
 
-const productSchema = new Schema({
+export const productSchema = new Schema({
     title:{
         type:String,
         required:true,

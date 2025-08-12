@@ -1,5 +1,6 @@
 
 import mongoose from "mongoose";
+import { productSchema } from "./ProductModel";
 const Schema = mongoose.Schema;
 
 const OrdersSchema = new Schema({
@@ -76,9 +77,12 @@ const OrdersSchema = new Schema({
         enum: ["processing", "confirmed", "shipped", "out for delivery", "delivered"],
         default: "processing"
 
+    },
+    
+    // DELIVERED DATE:
 
-
-
+    deliveredAt:{
+        type: Date
     }
 
 

@@ -40,12 +40,23 @@ export default function YourOrdersPage({ orders = [] }) {
       item?.title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     const matchesStatus =
-      statusFilter === "All" ? true : order.status.toLowerCase() === statusFilter.toLowerCase();
+      statusFilter === "All"
+        ? true
+        : order.status.toLowerCase() === statusFilter.toLowerCase();
     const orderDate = new Date(order.createdAt);
     const matchesDateRange = (!dateRange.from || orderDate >= dateRange.from) &&
       (!dateRange.to || orderDate <= dateRange.to);
     return matchesSearch && matchesStatus && matchesDateRange;
   });
+
+  // Supported statuses for filter
+  const supportedStatuses = [
+    "Processing",
+    "Confirmed",
+    "Shipped",
+    "Out for Delivery",
+    "Delivered"
+  ];
 
   return (
     <div className="w-full min-h-screen bg-background py-8">
@@ -76,10 +87,9 @@ export default function YourOrdersPage({ orders = [] }) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="All">All</SelectItem>
-                <SelectItem value="Processing">Processing</SelectItem>
-                <SelectItem value="Shipped">Shipped</SelectItem>
-                <SelectItem value="Delivered">Delivered</SelectItem>
-                <SelectItem value="Cancelled">Cancelled</SelectItem>
+                {supportedStatuses.map((status) => (
+                  <SelectItem key={status} value={status}>{status}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -173,8 +183,12 @@ export default function YourOrdersPage({ orders = [] }) {
                     ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200"
                     : order.status.toLowerCase() === "processing"
                     ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200"
-                    : order.status.toLowerCase() === "shipped"
+                    : order.status.toLowerCase() === "confirmed"
                     ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200"
+                    : order.status.toLowerCase() === "shipped"
+                    ? "bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200"
+                    : order.status.toLowerCase() === "out for delivery"
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200"
                     : "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
                 }`}
               >
@@ -208,7 +222,7 @@ export default function YourOrdersPage({ orders = [] }) {
                   {/* Total Price */}
                   <div className="mt-2 flex items-center justify-between">
                     <p className="text-sm font-medium text-foreground">
-                      Total: ${order.pricing.total}
+                      Total: ${order.pricing.total.toFixed(2)}
                     </p>
                       <Button variant="ghost" className="text-sm">
                         View <span className="ml-1">→</span>
@@ -218,7 +232,10 @@ export default function YourOrdersPage({ orders = [] }) {
 
                   {/* Order ID + Date */}
                   <div className="text-sm text-muted-foreground mt-4 truncate">
-                    Order ID: {order.orderId} | Date: {format(new Date(order.createdAt), "yyyy-MM-dd")}
+                    Order ID: {order.orderId} | Date:{" "}
+                    {order.status.toLowerCase() === "delivered" && order?.deliveredAt
+                      ? format(new Date(order.deliveredAt), "yyyy-MM-dd")
+                      : format(new Date(order.createdAt), "yyyy-MM-dd")}
                   </div>
                 </div>
               </div>

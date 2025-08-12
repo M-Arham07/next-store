@@ -9,12 +9,11 @@ export default async function YOUR_ORDERS_PAGE() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
-    return redirect('/login?message=Please login (or signup) first to proceed &redirect=/checkout');
+    return redirect('/login?message=Please login (or signup) first to proceed &redirect=/orders');
   }
 
   // If theres an error while finding orders it will return empty array []!
   const orders = await GetOrderByEmail(session.user.email);
-  console.log(`Orders for ${session.user.email} are:`, JSON.stringify(orders));
 
   return <YourOrdersPage orders={orders} />
 
