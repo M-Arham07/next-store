@@ -20,8 +20,8 @@ const OrdersSchema = new Schema({
 
     },
 
-    
-   // DELIVERY DETAILS + ADDRESS:
+
+    // DELIVERY DETAILS + ADDRESS:
 
     deliveryDetails: {
         address: { type: String, required: true },
@@ -46,13 +46,13 @@ const OrdersSchema = new Schema({
 
     // ORDERED ITEMS!:
 
-    orderedItems: {     
+    orderedItems: {
         type: [mongoose.Types.ObjectId], //Array of object Ids!
         required: true,
-        ref:'Product', // reference to Product (products) collection
+        ref: 'Product', // reference to Product (products) collection
 
         // We can populate orderedItems before  showing results on Orders page, to also get all products!
-        
+
     },
 
     // PRICING, TOTAL AND DISCOUNT!
@@ -70,19 +70,31 @@ const OrdersSchema = new Schema({
     },
 
     // CURRENT ORDER STATUS - FOR TRACKING:
-    
+
     status: {
         type: String,
         required: true,
-        enum: ["processing", "confirmed", "shipped", "out for delivery", "delivered"],
+        enum: ["processing", "confirmed", "shipped", "out for delivery", "delivered", "cancelled"],
         default: "processing"
 
     },
-    
-    // DELIVERED DATE:
 
-    deliveredAt:{
+    // DELIVERED DATE:
+    deliveredAt: {
         type: Date
+    },
+
+    // CANCELLED DATE: MUST EXIST IF STATUS IS cancelled
+    cancelledAt: {
+        type: Date,
+        required: function () { return this.status === "cancelled" }
+    },
+
+    // CANCELLATION REASON: MUST EXIST IF CANCELLED AT EXISTS!
+
+    cancelReason: {
+        type: String,
+        required: function () { return !!this.cancelledAt }
     }
 
 

@@ -3,14 +3,22 @@ import ConnectDB from "@/backend-utilities/ConnectDB";
 import Orders from "@/backend-utilities/models/OrdersModel";
 
 
+/* This function is only for use in admin panel! 
+   It finds all orders in the orders collection and returns them as an OBJECT
+
+*/
+
 const GetAllOrders = unstable_cache(
     async () => {
+
 
         try {
 
             await ConnectDB();
-            const allOrders = await Orders.find().lean();
-            return allOrders;
+            const allOrders = await Orders.find().populate("orderedItems").lean();
+
+            
+            return JSON.parse(JSON.stringify(allOrders));
 
         }
         catch (err) {
@@ -21,7 +29,7 @@ const GetAllOrders = unstable_cache(
 
 
     },
-    ['orders'],
+    ['all-orders'],
     { tags: ['orders'] }
 );
 

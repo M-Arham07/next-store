@@ -1,6 +1,6 @@
 "use client"
 
-import {  useState, useRef } from "react"
+import { useState, useRef } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -24,6 +24,7 @@ import DeleteUser from "@/backend-utilities/delete-user/DeleteUser";
 import useNotification from "@/hooks/useNotification";
 import AlertNotification from "@/components/AlertNotification"
 import RevokeAdmin from "@/backend-utilities/revoke-admin/revoke-admin"
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog"
 
 
 
@@ -71,7 +72,7 @@ export default function ManageUsersPage({ ALL_USERS = [], SU = false }) {
   const initialSeparatedUsers = ALL_USERS.reduce(
     (acc, user) => {
       const formattedUser = formatUser(user);
-      if (["admin","superuser"].includes(user?.role)) {
+      if (["admin", "superuser"].includes(user?.role)) {
         acc.admins.push(formattedUser);
       } else {
         acc.users.push(formattedUser);
@@ -168,7 +169,7 @@ export default function ManageUsersPage({ ALL_USERS = [], SU = false }) {
   }
 
 
-  const [alertMessage,setAlertMessage] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
 
   const confirmDeleteUser = async () => {
     // DELETE USER LOGIC, we're using id cuz its mapped to _id in this page!
@@ -187,9 +188,9 @@ export default function ManageUsersPage({ ALL_USERS = [], SU = false }) {
     setIsRevokeDialogOpen(true)
   }
 
- 
 
-  
+
+
   const confirmRevokeAdmin = async () => {
     // REMOVE ADMIN LOGIC:
     //  We're using id cuz its mapped to _id in this page!
@@ -233,7 +234,7 @@ export default function ManageUsersPage({ ALL_USERS = [], SU = false }) {
 
             {/* isAdmin indicates if the UserCard is in the ADMIN ACCORDION!
             HINT: Read isAdmin as isAdminAccordion !
-             */}  
+             */}
 
 
             {isAdmin ? SU && !user?.isSuperuser && (
@@ -499,47 +500,24 @@ export default function ManageUsersPage({ ALL_USERS = [], SU = false }) {
       </Dialog>
 
       {/* Delete User Confirmation */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete User</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete {userToDelete?.name}? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDeleteUser}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteConfirmationDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Delete User"
+        description={`Are you sure you want to delete ${userToDelete?.name}? This action cannot be undone.`}
+        actionName="Delete User"
+        onConfirm={confirmDeleteUser}
+      />
 
-      {/* Revoke Admin Confirmation */}
-      <AlertDialog open={isRevokeDialogOpen} onOpenChange={setIsRevokeDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Revoke Admin Access</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to revoke admin access for {adminToRevoke?.name}? They will lose all administrative
-              privileges.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmRevokeAdmin}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Revoke
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {/* Revoke Admin Confirmation, ONLY WORKS FOR SUPERUSER! */}
+      <DeleteConfirmationDialog
+        open={isRevokeDialogOpen}
+        onOpenChange={setIsRevokeDialogOpen}
+        title="Revoke Admin Access"
+        description={` Are you sure you want to revoke admin access for ${adminToRevoke?.name}? They will lose all administrative privileges.`}
+        actionName="Revoke"
+        onConfirm={confirmRevokeAdmin}
+      />
 
       {showNotification && <AlertNotification message={alertMessage} />}
     </div>
