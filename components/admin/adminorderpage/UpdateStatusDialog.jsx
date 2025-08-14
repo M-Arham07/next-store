@@ -52,7 +52,7 @@ export default function UpdateStatusDialog() {
                         onClick={() => setStatusDialogOpen(false)}
                         disabled={statusLoading}
                     >
-                        Cancel
+                        Cancels
                     </Button>
                     <Button
                         onClick={handleUpdateStatus}

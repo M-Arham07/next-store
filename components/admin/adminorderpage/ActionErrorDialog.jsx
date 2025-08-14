@@ -2,6 +2,7 @@
 
 import { OrderManagerContext } from "@/contexts/OrderManagerProvider";
 import { useContext } from "react";
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 
 export default function ActionErrorDialog() {
 

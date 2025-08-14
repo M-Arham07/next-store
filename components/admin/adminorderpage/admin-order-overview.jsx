@@ -6,24 +6,13 @@ import {
   Card,
   CardContent,
   CardHeader,
-  CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  MoreVertical,
   Edit,
   XCircle,
   MapPin,
@@ -39,27 +28,33 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
-import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
-import { z } from "zod";
-import UpdateOrderStatus from "@/backend-utilities/order-related/UpdateOrderStatus";
-import RejectOrder from "@/backend-utilities/order-related/RejectOrder";
-import useNotification from "@/hooks/useNotification";
+
 import AlertNotification from "@/components/AlertNotification";
-import useOrderManager from "@/hooks/useOrderManager";
 import UpdateStatusDialog from "@/components/admin/adminorderpage/UpdateStatusDialog";
 import RejectOrderDialog from "@/components/admin/adminorderpage/RejectOrderDialog";
 import { OrderManagerContext } from "@/contexts/OrderManagerProvider";
+import ActionErrorDialog from "./ActionErrorDialog";
 
 // Accept the current order as a prop
 export default function AdminOrderOverview({ currentOrder }) {
 
-  console.log("The current order received on client side is",currentOrder)
 
 
 
-  const { showNotification } = useContext(OrderManagerContext);
 
-  
+
+  const { showNotification,
+    setCurrentOrder,
+    nextStatus, setStatusDialogOpen,  
+    setDeleteDialogOpen } = useContext(OrderManagerContext);
+
+  useEffect(() => setCurrentOrder(currentOrder), [currentOrder]);
+
+
+
+
+
+
   // Hydration-safe order date/time
   const [orderDateTime, setOrderDateTime] = useState("");
   const [deliveredDateTime, setDeliveredDateTime] = useState("");
@@ -219,7 +214,7 @@ export default function AdminOrderOverview({ currentOrder }) {
                 <Button
                   variant="destructive"
                   className="w-1/2 min-w-[120px] max-w-[180px]"
-                  onClick={() => setDeleteDialogOpen(true)}                           
+                  onClick={() => setDeleteDialogOpen(true)}
                 >
                   Reject Order
                 </Button>
@@ -453,7 +448,10 @@ export default function AdminOrderOverview({ currentOrder }) {
               {/* Delete Confirmation Dialog */}
               <RejectOrderDialog />
 
-              
+              {/* Error Dialog */}
+              <ActionErrorDialog />
+
+
             </motion.div>
           </main>
         </div>

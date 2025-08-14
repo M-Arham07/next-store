@@ -1,6 +1,6 @@
 "use client";
 import useNotification from "@/hooks/useNotification";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import RejectOrder from "@/backend-utilities/order-related/RejectOrder";
 import UpdateOrderStatus from "@/backend-utilities/order-related/UpdateOrderStatus";
@@ -14,8 +14,10 @@ import UpdateStatusDialog from "@/components/admin/adminorderpage/UpdateStatusDi
 
 
 
-export default function useOrderManager(currentOrder) {
+export default function useOrderManager() {
 
+
+    const [currentOrder, setCurrentOrder] = useState({});
     const [statusDialogOpen, setStatusDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [cancelReason, setCancelReason] = useState("");
@@ -29,6 +31,7 @@ export default function useOrderManager(currentOrder) {
 
 
 
+
     const statusFlow = ["processing", "confirmed", "shipped", "out for delivery", "delivered"];
     // Find the next status
     const currentStatusIndex = statusFlow.indexOf(currentOrder?.status);
@@ -36,6 +39,8 @@ export default function useOrderManager(currentOrder) {
         currentStatusIndex >= 0 && currentStatusIndex < statusFlow.length - 1
             ? statusFlow[currentStatusIndex + 1]
             : null;
+
+
 
 
 
@@ -80,7 +85,7 @@ export default function useOrderManager(currentOrder) {
     const handleRejectOrder = async () => {
         if (!cancelReasonError && cancelReason.length >= 10) {
             setRejectLoading(true);
-            const isRejected = await RejectOrder(orderId, cancelReason);
+            const isRejected = await RejectOrder(currentOrder.orderId, cancelReason);
             setRejectLoading(false);
             if (isRejected) {
                 notify();
@@ -94,13 +99,14 @@ export default function useOrderManager(currentOrder) {
     }
 
     return {
+
+        // STATES:
         statusDialogOpen,
         setStatusDialogOpen,
         deleteDialogOpen,
         setDeleteDialogOpen,
         cancelReason,
         setCancelReason,
-        cancelReasonError,
         handleCancelReasonChange,
         errorDialogOpen,
         setErrorDialogOpen,
@@ -111,8 +117,16 @@ export default function useOrderManager(currentOrder) {
         rejectLoading,
         setRejectLoading,
         notify,
+
+        // STATE TO SET CURRENT ORDER:
+        setCurrentOrder,
+        
+        
+        //VALUES:
+        nextStatus,
+        cancelReasonError,
         handleRejectOrder,
-        nextStatus
+        handleUpdateStatus
 
     }
 
