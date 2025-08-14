@@ -182,7 +182,7 @@ export default function ManageOrdersPage({ allOrders = [] }) {
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem>Update Status</DropdownMenuItem>
+                          <DropdownMenuItem >Update Status</DropdownMenuItem>
                           <DropdownMenuItem className="text-red-600">Cancel Order</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

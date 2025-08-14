@@ -18,7 +18,10 @@ export default async function ADMIN_ORDER_OVERVIEW({ params }) {
   const [foundOrder] = allOrders.filter(order => order.orderId === orderId);
 
   // If no found order:
+  console.log(foundOrder)
   if(!foundOrder || foundOrder.length === 0) return notFound();
+
+
 
   return <AdminOrderOverview currentOrder={foundOrder} />
 }

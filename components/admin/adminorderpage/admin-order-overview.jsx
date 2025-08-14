@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import {
@@ -45,31 +45,21 @@ import UpdateOrderStatus from "@/backend-utilities/order-related/UpdateOrderStat
 import RejectOrder from "@/backend-utilities/order-related/RejectOrder";
 import useNotification from "@/hooks/useNotification";
 import AlertNotification from "@/components/AlertNotification";
+import useOrderManager from "@/hooks/useOrderManager";
+import UpdateStatusDialog from "@/components/admin/adminorderpage/UpdateStatusDialog";
+import RejectOrderDialog from "@/components/admin/adminorderpage/RejectOrderDialog";
+import { OrderManagerContext } from "@/contexts/OrderManagerProvider";
 
 // Accept the current order as a prop
 export default function AdminOrderOverview({ currentOrder }) {
 
-  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [cancelReason, setCancelReason] = useState("");
-  const [cancelReasonError, setCancelReasonError] = useState("");
-  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
-  const [errorDialogMsg, setErrorDialogMsg] = useState("");
-  const [statusLoading, setStatusLoading] = useState(false);
-  const [rejectLoading, setRejectLoading] = useState(false);
+  console.log("The current order received on client side is",currentOrder)
 
-  // Notification hook
-  const { showNotification, notify } = useNotification(3000);
 
-  // Supported statuses in order
-  const statusFlow = ["processing", "confirmed", "shipped", "out for delivery", "delivered"];
-  // Find the next status
-  const currentStatusIndex = statusFlow.indexOf(currentOrder?.status);
-  const nextStatus =
-    currentStatusIndex >= 0 && currentStatusIndex < statusFlow.length - 1
-      ? statusFlow[currentStatusIndex + 1]
-      : null;
 
+  const { showNotification } = useContext(OrderManagerContext);
+
+  
   // Hydration-safe order date/time
   const [orderDateTime, setOrderDateTime] = useState("");
   const [deliveredDateTime, setDeliveredDateTime] = useState("");
@@ -126,19 +116,7 @@ export default function AdminOrderOverview({ currentOrder }) {
   const promoCode = currentOrder?.pricing?.discount?.promoCode;
   const total = currentOrder?.pricing?.total ?? 0;
 
-  // Zod schema for cancel reason
-  const cancelReasonSchema = z.string().min(10, "Reason must be at least 10 characters");
 
-  function handleCancelReasonChange(e) {
-    const value = e.target.value;
-    setCancelReason(value);
-    try {
-      cancelReasonSchema.parse(value);
-      setCancelReasonError("");
-    } catch (err) {
-      setCancelReasonError(err.errors?.[0]?.message || "Cancel Reason must be atleast 10 characters");
-    }
-  }
 
   return (
     <div className="min-h-screen p-4 sm:p-6 lg:p-10 bg-white dark:bg-black text-slate-900 dark:text-slate-100 transition-colors duration-300">
@@ -241,7 +219,7 @@ export default function AdminOrderOverview({ currentOrder }) {
                 <Button
                   variant="destructive"
                   className="w-1/2 min-w-[120px] max-w-[180px]"
-                  onClick={() => setDeleteDialogOpen(true)}
+                  onClick={() => setDeleteDialogOpen(true)}                           
                 >
                   Reject Order
                 </Button>
@@ -471,111 +449,11 @@ export default function AdminOrderOverview({ currentOrder }) {
               </Card>
 
               {/* Status Update Confirmation Dialog */}
-              <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>
-                      {nextStatus ? (
-                        <div className="flex flex-col items-start gap-2">
-                          <span className="text-base text-black dark:text-white">
-                            Are you sure you want to update the status to:
-                          </span>
-                          <span
-                            className="font-bold text-2xl text-black dark:text-white px-2 py-1 rounded"
-
-                          >
-                            {nextStatus.replace(/-/g, " ").replace(/\b\w/g, l => l.toUpperCase())} ?
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-black dark:text-white">No further status available</span>
-                      )}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <DialogFooter>
-                    <Button
-                      variant="outline"
-                      onClick={() => setStatusDialogOpen(false)}
-                      disabled={statusLoading}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      onClick={async () => {
-                        if (nextStatus) {
-                          setStatusLoading(true);
-                          const isUpdated = await UpdateOrderStatus(currentOrder.orderId, nextStatus);
-                          setStatusLoading(false);
-                          if (isUpdated) {
-                            notify();
-                          } else {
-                            setErrorDialogMsg("Failed to update order status. Please try again.");
-                            setErrorDialogOpen(true);
-                          }
-                        }
-                        setStatusDialogOpen(false);
-                      }}
-                      disabled={!nextStatus || statusLoading}
-                    >
-                      {statusLoading ? "Updating..." : "Yes"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+              <UpdateStatusDialog />
               {/* Delete Confirmation Dialog */}
-              <DeleteConfirmationDialog
-                open={deleteDialogOpen}
-                onOpenChange={setDeleteDialogOpen}
-                title="Reject Order"
-                description={
-                  <>
-                    <span>
-                      Are you sure you want to reject this order? This action cannot be undone.
-                    </span>
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-black dark:text-white mb-1">
-                        Cancel Reason <span className="text-red-600">*</span>
-                      </label>
-                      <textarea
-                        className="w-full border rounded-md p-2 text-black dark:text-white bg-white dark:bg-black"
-                        rows={3}
-                        value={cancelReason}
-                        onChange={handleCancelReasonChange}
-                        placeholder="Please enter the reason for cancellation (min 10 characters)"
-                      />
-                      {cancelReasonError && (
-                        <div className="text-red-600 text-xs mt-1">{cancelReasonError}</div>
-                      )}
-                    </div>
-                  </>
-                }
-                actionName={rejectLoading ? "Rejecting..." : "Reject"}
-                onConfirm={async () => {
-                  if (!cancelReasonError && cancelReason.length >= 10) {
-                    setRejectLoading(true);
-                    const isRejected = await RejectOrder(currentOrder.orderId, cancelReason);
-                    setRejectLoading(false);
-                    if (isRejected) {
-                      notify();
-                      setDeleteDialogOpen(false);
-                      setCancelReason("");
-                    } else {
-                      setErrorDialogMsg("Failed to reject order. Please try again.");
-                      setErrorDialogOpen(true);
-                    }
-                  }
-                }}
-                actionDisabled={!!cancelReasonError || cancelReason.length < 10 || rejectLoading}
-              />
-              <DeleteConfirmationDialog
-                open={errorDialogOpen}
-                onOpenChange={setErrorDialogOpen}
-                title="Error"
-                description={errorDialogMsg}
-                actionName="Close"
-                onConfirm={() => setErrorDialogOpen(false)}
-                actionDisabled={false}
-              />
+              <RejectOrderDialog />
+
+              
             </motion.div>
           </main>
         </div>
