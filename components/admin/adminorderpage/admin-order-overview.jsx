@@ -19,6 +19,7 @@ import {
   Phone,
   Mail,
   CheckCircle,
+  Eye,
 } from "lucide-react";
 import {
   Table,
@@ -34,6 +35,8 @@ import UpdateStatusDialog from "@/components/admin/adminorderpage/UpdateStatusDi
 import RejectOrderDialog from "@/components/admin/adminorderpage/RejectOrderDialog";
 import { OrderManagerContext } from "@/contexts/OrderManagerProvider";
 import ActionErrorDialog from "./ActionErrorDialog";
+import ViewReasonDialog from "./ViewReasonDialog";
+import ViewShippingDialog from "./ViewShippingDialog";
 
 // Accept the current order as a prop
 export default function AdminOrderOverview({ currentOrder }) {
@@ -43,10 +46,15 @@ export default function AdminOrderOverview({ currentOrder }) {
 
 
 
-  const { showNotification,
+  const {
+    showNotification,
     setCurrentOrder,
-    nextStatus, setStatusDialogOpen,  
-    setDeleteDialogOpen } = useContext(OrderManagerContext);
+    nextStatus, setStatusDialogOpen,
+    setDeleteDialogOpen,
+    reasonDialogOpen,
+    setReasonDialogOpen,
+    shippingDialogOpen,
+    setShippingDialogOpen } = useContext(OrderManagerContext);
 
   useEffect(() => setCurrentOrder(currentOrder), [currentOrder]);
 
@@ -58,32 +66,36 @@ export default function AdminOrderOverview({ currentOrder }) {
   // Hydration-safe order date/time
   const [orderDateTime, setOrderDateTime] = useState("");
   const [deliveredDateTime, setDeliveredDateTime] = useState("");
+
+
   useEffect(() => {
     if (currentOrder?.createdAt) {
-      setOrderDateTime(
-        new Date(currentOrder.createdAt).toLocaleString(undefined, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true,
-        })
-      );
+      const date = new Date(currentOrder.createdAt);
+      // Ensure consistent date format
+      const day = date.getDate();
+      const month = date.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+      const year = date.getFullYear();
+      const time = date.toLocaleString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      }).toUpperCase();
+      setOrderDateTime(`${day} ${month} ${year}, ${time}`);
     }
     if (currentOrder?.deliveredAt) {
-      setDeliveredDateTime(
-        new Date(currentOrder.deliveredAt).toLocaleString(undefined, {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: true,
-        })
-      );
+      const date = new Date(currentOrder.deliveredAt);
+      // Ensure consistent date format
+      const day = date.getDate();
+      const month = date.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+      const year = date.getFullYear();
+      const time = date.toLocaleString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      }).toUpperCase();
+      setDeliveredDateTime(`${day} ${month} ${year}, ${time}`);
     }
   }, [currentOrder?.createdAt, currentOrder?.deliveredAt]);
 
@@ -174,7 +186,7 @@ export default function AdminOrderOverview({ currentOrder }) {
             ) : currentOrder?.status === "cancelled" ? (
               <div className="w-full flex justify-center items-center mt-4">
                 <div
-                  className="flex flex-col items-center sm:flex-row sm:items-center gap-2 sm:gap-3 px-6 py-4 rounded-2xl shadow-xl backdrop-blur-lg bg-red-400/30 dark:bg-red-700/30 border border-red-300/40 dark:border-red-800/40"
+                  className="flex flex-col items-center gap-3 px-6 py-4 rounded-2xl shadow-xl backdrop-blur-lg bg-red-400/30 dark:bg-red-700/30 border border-red-300/40 dark:border-red-800/40 w-full max-w-[500px] sm:max-w-[600px]"
                   style={{
                     boxShadow: "0 8px 32px 0 rgba(239,68,68,0.25)",
                     border: "1.5px solid rgba(239,68,68,0.18)",
@@ -183,23 +195,44 @@ export default function AdminOrderOverview({ currentOrder }) {
                   <div className="flex items-center gap-2 justify-center w-full">
                     <XCircle className="w-8 h-8 text-red-600 drop-shadow-lg" />
                     <span className="text-lg sm:text-xl font-semibold text-red-900 dark:text-red-200 tracking-wide text-center">
-                      This order was cancelled at:
+                      This order was rejected on:
                     </span>
                   </div>
-                  <span className="text-base sm:text-lg font-mono text-red-900 dark:text-red-200 mt-1 sm:mt-0 text-center w-full">
-                    {(currentOrder.cancelledAt
-                      ? new Date(currentOrder.cancelledAt).toLocaleString(undefined, {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                        hour12: true,
-                      })
-                      : orderDateTime
-                    ).toLocaleUpperCase()}
-                  </span>
+
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="text-center">
+                      <div className="text-bold font-extrabold  ">
+                        {(() => {
+                          const date = new Date(currentOrder.cancelledAt || currentOrder.createdAt);
+                          return date.toLocaleDateString('en-US', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric'
+                          }).toUpperCase();
+                        })()}
+                      </div>
+                      <div className="text-bold font-extrabold"> at {""}
+                        {(() => {
+                          const date = new Date(currentOrder.cancelledAt || currentOrder.createdAt);
+                          return date.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true
+                          }).toUpperCase();
+                        })()}
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setReasonDialogOpen(true)}
+                      className="mt-1 w-full max-w-[200px] bg-red-500/10 hover:bg-red-500/20 text-red-900 dark:text-red-200"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      View Details
+                    </Button>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -266,41 +299,16 @@ export default function AdminOrderOverview({ currentOrder }) {
                 </div>
 
                 {/* Shipping */}
-                <div className="rounded-xl p-3 bg-blue-50/70 dark:bg-blue-900/30 border border-blue-200/60 dark:border-blue-800/40 text-sm">
-                  <div className="flex items-center justify-between">
-                    <div className="text-xs font-semibold text-blue-800 dark:text-blue-200">
-                      Shipping
-                    </div>
-                    <div className="text-sm font-bold text-blue-700 dark:text-blue-300">
-                      ${deliveryFee}
-                    </div>
-                  </div>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
-                      {currentOrder?.deliveryDetails?.address}
-                    </span>
-                    {currentOrder?.deliveryDetails?.googleMapsUrl && (
-                      <a
-                        href={currentOrder.deliveryDetails.googleMapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-blue-100 hover:bg-blue-200 dark:bg-blue-800 dark:hover:bg-blue-700 text-xs font-medium text-blue-700 dark:text-blue-200 transition"
-                      >
-                        <MapPin className="w-4 h-4" />
-                        View Location
-                      </a>
-                    )}
-                  </div>
-                  {currentOrder?.deliveryDetails?.instructions && (
-                    <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                      <span className="font-semibold">Instructions:</span> {currentOrder.deliveryDetails.instructions}
-                    </div>
-                  )}
-                  {currentOrder?.deliveryDetails?.landmark && (
-                    <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                      <span className="font-semibold">Landmark:</span> {currentOrder.deliveryDetails.landmark}
-                    </div>
-                  )}
+                <div className="flex justify-center">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => setShippingDialogOpen(true)}
+                    className="w-76.5 bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    <MapPin className="w-4 h-4 mr-2" />
+                    View Shipping
+                  </Button>
                 </div>
 
                 {/* Call and Email buttons */}
@@ -325,7 +333,7 @@ export default function AdminOrderOverview({ currentOrder }) {
                   >
                     <Button
                       type="button"
-                      className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+                      className="flex items-center gap-2"
                     >
                       <Mail className="w-4 h-4" />
                       Email Customer
@@ -451,6 +459,23 @@ export default function AdminOrderOverview({ currentOrder }) {
               {/* Error Dialog */}
               <ActionErrorDialog />
 
+              <ViewReasonDialog
+                open={reasonDialogOpen}
+                onOpenChange={setReasonDialogOpen}
+                cancelDetails={{
+                  cancelledAt: currentOrder?.cancelledAt,
+                  reason: currentOrder?.cancelReason
+                }}
+              />
+
+              <ViewShippingDialog
+                open={shippingDialogOpen}
+                onOpenChange={setShippingDialogOpen}
+                shippingDetails={{
+                  ...currentOrder?.deliveryDetails,
+                  deliveryFee
+                }}
+              />
 
             </motion.div>
           </main>

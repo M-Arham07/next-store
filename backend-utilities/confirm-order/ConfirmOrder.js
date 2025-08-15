@@ -58,6 +58,7 @@ export default async function ConfirmOrder(orderDetails) {
         /*If theres any type mismatch or missing required fields, mongoose will automatically
          throw an error! */
 
+
         await Orders.create({ orderId, ...orderDetails, status: 'processing' });
 
         // Refresh cache for orders!

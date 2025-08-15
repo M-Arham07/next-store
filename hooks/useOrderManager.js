@@ -26,6 +26,8 @@ export default function useOrderManager() {
     const [errorDialogMsg, setErrorDialogMsg] = useState("");
     const [statusLoading, setStatusLoading] = useState(false);
     const [rejectLoading, setRejectLoading] = useState(false);
+    const [reasonDialogOpen, setReasonDialogOpen] = useState(false);
+    const [shippingDialogOpen, setShippingDialogOpen] = useState(false);
 
     const { showNotification, notify } = useNotification(3000);
 
@@ -116,12 +118,14 @@ export default function useOrderManager() {
         setStatusLoading,
         rejectLoading,
         setRejectLoading,
+        shippingDialogOpen, setShippingDialogOpen,
+        reasonDialogOpen, setReasonDialogOpen,
         notify,
 
         // STATE TO SET CURRENT ORDER:
         setCurrentOrder,
-        
-        
+
+
         //VALUES:
         nextStatus,
         cancelReasonError,
