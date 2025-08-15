@@ -193,60 +193,65 @@ export default function ManageOrdersPage({ allOrders = [] }) {
               <TableBody>
                 {filteredOrders.map((order, idx) => (
                   <TableRow key={order._id}
-                    className="cursor-pointer"
+                    className="cursor-pointer h-[70px]"
                     onClick={() => router.push(`/admin/orders/${order.orderId}`)}
                   >
 
-                    <TableCell className="font-medium">
-                      {order.orderId}</TableCell>
-                    <TableCell>
+                    <TableCell className="font-medium py-4">
+                      {order.orderId}
+                    </TableCell>
+                    <TableCell className="py-4">
                       <div className="flex flex-col">
                         <span className="font-medium truncate">{order.customerDetails.name}</span>
                         <span className="text-xs text-muted-foreground truncate">{order.customerDetails.phone}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{getStatusBadge(order.status)}</TableCell>
-                    <TableCell className="font-medium">${order.pricing.total.toFixed(2)}</TableCell>
-                    <TableCell className="text-sm">{order.orderedItems.length}</TableCell>
-                    <TableCell className="text-sm">
+                    <TableCell className="py-4">{getStatusBadge(order.status)}</TableCell>
+                    <TableCell className="font-medium py-4">${order.pricing.total.toFixed(2)}</TableCell>
+                    <TableCell className="text-sm py-4">{order.orderedItems.length}</TableCell>
+                    <TableCell className="text-sm py-4">
                       {formattedDates[order._id] || ''}
                     </TableCell>
                     <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu onOpenChange={() => setCurrentOrder(order)}>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
+                          <Button variant="ghost" className="h-10 w-10 p-0 hover:bg-muted">
                             <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
+                            <MoreHorizontal className="h-6 w-6" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <Link href={`/admin/orders/${order.orderId}`}>
-                            <DropdownMenuItem>
-                              <Eye className="mr-2 h-4 w-4" />
+                        <DropdownMenuContent align="end" className="w-[200px]">
+                          <Link href={`/admin/orders/${order.orderId}`} className="w-full">
+                            <DropdownMenuItem className="h-11 py-2 border-b cursor-pointer">
+                              <Eye className="mr-3 h-5 w-5" />
                               View Details
                             </DropdownMenuItem>
                           </Link>
 
                           {order.status === "cancelled" ? (
-                            <DropdownMenuItem onClick={() => setReasonDialogOpen(true)}>
-                              <HelpCircle className="mr-2 h-4 w-4" />
+                            <DropdownMenuItem 
+                              onClick={() => setReasonDialogOpen(true)}
+                              className="h-11 py-2 cursor-pointer"
+                            >
+                              <HelpCircle className="mr-3 h-5 w-5" />
                               View Cancel Reason
                             </DropdownMenuItem>
-                          ) : (
+                          ) : order.status !== "delivered" && (
                             <>
-                              <DropdownMenuItem onClick={() => setStatusDialogOpen(true)}>
+                              <DropdownMenuItem 
+                                onClick={() => setStatusDialogOpen(true)}
+                                className="h-11 py-2 border-b cursor-pointer"
+                              >
                                 Update Status
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                className="text-red-600"
+                                className="h-11 py-2 text-red-600 cursor-pointer"
                                 onClick={() => setDeleteDialogOpen(true)}
                               >
                                 Reject Order
                               </DropdownMenuItem>
                             </>
                           )}
-
-
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>

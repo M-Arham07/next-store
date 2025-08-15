@@ -1,5 +1,5 @@
 import GetAllOrders from "@/backend-utilities/GetAllOrders";
-import ManageOrdersPage from "@/components/admin/adminorderpage/admin-order";
+import ManageOrdersPage from "@/components/admin/adminorderpage/ManageOrdersPage";
 
 
 export default async function AdminOrders(){

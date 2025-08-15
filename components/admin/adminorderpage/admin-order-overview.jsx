@@ -350,28 +350,35 @@ export default function AdminOrderOverview({ currentOrder }) {
                       : currentOrder?.paymentDetails?.method}
                   </div>
                 </div>
-                {currentOrder?.paymentDetails?.codSurcharge ? (
+                {currentOrder?.paymentDetails?.codSurcharge && (
                   <div className="flex items-center justify-between">
                     <div className="text-sm text-slate-500 dark:text-slate-400">COD Surcharge</div>
                     <div className="text-sm font-medium">${currentOrder.paymentDetails.codSurcharge}</div>
                   </div>
-                ) : null}
+                )}
 
                 {/* Totals */}
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-slate-500 dark:text-slate-400">Subtotal</div>
                   <div className="text-sm font-medium">${subtotal.toFixed(2)}</div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-slate-500 dark:text-slate-400">Discount</div>
-                  <div className="text-sm font-medium text-green-600">
-                    -${discountAmount.toFixed(2)}
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-slate-500 dark:text-slate-400">Promo Code</div>
-                  <div className="text-sm font-medium">{promoCode || "—"}</div>
-                </div>
+                {discountAmount > 0 && (
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-slate-500 dark:text-slate-400">Discount</div>
+                    <div className="text-sm font-medium text-green-600">
+                      -${discountAmount.toFixed(2)}
+                    </div>
+                  </div>)}
+
+
+                {promoCode &&
+                  (<div className="flex items-center justify-between">
+                    <div className="text-sm text-slate-500 dark:text-slate-400">Promo Code</div>
+                    <div className="text-sm font-medium">{promoCode || "—"}</div>
+                  </div>)
+
+                }
+
                 <div className="flex items-center justify-between pt-2 border-t border-slate-100/40 dark:border-slate-700/30">
                   <div className="text-sm text-slate-500 dark:text-slate-400">Total</div>
                   <div className="text-xl font-bold">${total}</div>
@@ -436,7 +443,7 @@ export default function AdminOrderOverview({ currentOrder }) {
                   <div className="p-4 sm:p-6 border-t border-slate-100/10 dark:border-slate-700/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div />
                     <div className="flex items-center gap-3 w-full sm:w-auto">
-                 
+
                     </div>
                   </div>
                 </CardContent>
