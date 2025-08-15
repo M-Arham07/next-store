@@ -39,6 +39,10 @@ export default function CancelReasonDialog({ open, onOpenChange, cancelDetails }
             Cancellation Time:
             <span>{formattedTime}</span>
           </div>
+          <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+            <span className="font-medium">Cancelled By:</span>
+            <span className="capitalize">{cancelDetails.cancelledBy || "Unknown"}</span>
+          </div>
           <div className="mt-4">
             <h4 className="text-sm font-semibold mb-2">Reason:</h4>
             <p className="text-sm text-slate-600 dark:text-slate-300 p-3 bg-slate-100 dark:bg-slate-800 rounded-md">

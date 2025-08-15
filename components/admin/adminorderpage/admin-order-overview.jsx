@@ -13,7 +13,6 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip } from "@/components/ui/tooltip";
 import { Separator } from "@/components/ui/separator";
 import {
-  Edit,
   XCircle,
   MapPin,
   Phone,
@@ -34,10 +33,9 @@ import AlertNotification from "@/components/AlertNotification";
 import UpdateStatusDialog from "@/components/admin/adminorderpage/UpdateStatusDialog";
 import RejectOrderDialog from "@/components/admin/adminorderpage/RejectOrderDialog";
 import { OrderManagerContext } from "@/contexts/OrderManagerProvider";
-import ActionErrorDialog from "./ActionErrorDialog";
-import ViewReasonDialog from "./ViewReasonDialog";
-import ViewShippingDialog from "./ViewShippingDialog";
-
+import ActionErrorDialog from "@/components/admin/adminorderpage/ActionErrorDialog";
+import ViewShippingDialog from "@/components/admin/adminorderpage/ViewShippingDialog";
+import CancelReasonDialog from "@/components/admin/adminorderpage/CancelReasonDialog";
 // Accept the current order as a prop
 export default function AdminOrderOverview({ currentOrder }) {
 
@@ -393,9 +391,6 @@ export default function AdminOrderOverview({ currentOrder }) {
                       {currentOrder?.orderedItems?.length || 0} products
                     </p>
                   </div>
-                  <Button variant="ghost" className="px-3 py-2">
-                    <Edit className="w-4 h-4" />
-                  </Button>
                 </CardHeader>
 
                 <CardContent className="p-0">
@@ -441,11 +436,7 @@ export default function AdminOrderOverview({ currentOrder }) {
                   <div className="p-4 sm:p-6 border-t border-slate-100/10 dark:border-slate-700/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div />
                     <div className="flex items-center gap-3 w-full sm:w-auto">
-                      <Tooltip content="Cancel currentOrder">
-                        <Button variant="ghost" className="px-3 py-2">
-                          <XCircle className="w-4 h-4" />
-                        </Button>
-                      </Tooltip>
+                 
                     </div>
                   </div>
                 </CardContent>
@@ -459,12 +450,13 @@ export default function AdminOrderOverview({ currentOrder }) {
               {/* Error Dialog */}
               <ActionErrorDialog />
 
-              <ViewReasonDialog
+              <CancelReasonDialog
                 open={reasonDialogOpen}
                 onOpenChange={setReasonDialogOpen}
                 cancelDetails={{
                   cancelledAt: currentOrder?.cancelledAt,
-                  reason: currentOrder?.cancelReason
+                  reason: currentOrder?.cancelReason,
+                  cancelledBy: currentOrder?.cancelledBy
                 }}
               />
 
@@ -482,7 +474,7 @@ export default function AdminOrderOverview({ currentOrder }) {
         </div>
         {showNotification && (
           <AlertNotification
-            message={`Order ${currentOrder.status === "cancelled" ? "cancelled" : `updated to ${currentOrder.status}`} successfully!`}
+            message={`Order ${currentOrder.status === "cancelled" ? "cancelled" : `status updated to ${currentOrder.status}`} successfully!`}
             linkName=""
             linkHref="#"
           />

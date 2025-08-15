@@ -16,8 +16,9 @@ import UpdateStatusDialog from "@/components/admin/adminorderpage/UpdateStatusDi
 
 export default function useOrderManager() {
 
-
+    // SET CURRENT ORDER:
     const [currentOrder, setCurrentOrder] = useState({});
+
     const [statusDialogOpen, setStatusDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [cancelReason, setCancelReason] = useState("");
@@ -37,7 +38,7 @@ export default function useOrderManager() {
     const statusFlow = ["processing", "confirmed", "shipped", "out for delivery", "delivered"];
     // Find the next status
     const currentStatusIndex = statusFlow.indexOf(currentOrder?.status);
-    const nextStatus =
+    let nextStatus =
         currentStatusIndex >= 0 && currentStatusIndex < statusFlow.length - 1
             ? statusFlow[currentStatusIndex + 1]
             : null;
@@ -66,11 +67,14 @@ export default function useOrderManager() {
 
 
     const handleUpdateStatus = async () => {
+
+
         if (nextStatus) {
             setStatusLoading(true);
             const isUpdated = await UpdateOrderStatus(currentOrder.orderId, nextStatus);
             setStatusLoading(false);
             if (isUpdated) {
+                setCurrentOrder((prev) => ({ ...prev, status: nextStatus }));
                 notify();
             } else {
                 setErrorDialogMsg("Failed to update order status. Please try again.");
@@ -87,9 +91,13 @@ export default function useOrderManager() {
     const handleRejectOrder = async () => {
         if (!cancelReasonError && cancelReason.length >= 10) {
             setRejectLoading(true);
-            const isRejected = await RejectOrder(currentOrder.orderId, cancelReason);
+
+            //set Cancelled by to admin:
+
+            const isRejected = await RejectOrder(currentOrder.orderId, cancelReason, "admin");
             setRejectLoading(false);
             if (isRejected) {
+                setCurrentOrder((prev) => ({ ...prev, status: "cancelled" }))
                 notify();
                 setDeleteDialogOpen(false);
                 setCancelReason("");
@@ -120,9 +128,10 @@ export default function useOrderManager() {
         setRejectLoading,
         shippingDialogOpen, setShippingDialogOpen,
         reasonDialogOpen, setReasonDialogOpen,
-        notify,
+        notify, showNotification,
 
         // STATE TO SET CURRENT ORDER:
+        currentOrder,
         setCurrentOrder,
 
 

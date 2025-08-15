@@ -95,6 +95,14 @@ const OrdersSchema = new Schema({
     cancelReason: {
         type: String,
         required: function () { return !!this.cancelledAt }
+    },
+
+    /* CANCELLED BY USER OR ADMIN ?
+       BOTH SUPERUSER AND ADMIN ARE ALLOWED TO CANCEL ORDERS! */
+    cancelledBy: {
+        type: String,
+        enum: ["user", "admin"],
+        required: function () { return this.status === "cancelled" }
     }
 
 
