@@ -3,6 +3,7 @@
 import { revalidateTag } from "next/cache";
 import ConnectDB from "../ConnectDB";
 import Orders from "@/backend-utilities/models/OrdersModel";
+import Products from "@/backend-utilities/models/ProductModel";
 
 export default async function RejectOrder(orderId, cancelReason, cancelledBy = "user") {
 
@@ -11,7 +12,7 @@ export default async function RejectOrder(orderId, cancelReason, cancelledBy = "
 
         await ConnectDB();
 
-        const order = await Orders.findOne({ orderId: orderId });
+        const order = await Orders.findOne({ orderId: orderId }).populate("orderedItems");
         console.log("Found",order)
 
         const SUPPORTED_CANCEL_STATUSES = ["processing","confirmed"]
@@ -35,6 +36,11 @@ export default async function RejectOrder(orderId, cancelReason, cancelledBy = "
             },
             { runValidators: true }
         );
+
+        // RE-INCREMENT PRODUCT QUANTITY:
+
+        
+
 
         // Revalidate tag to refresh cache!
 

@@ -307,7 +307,12 @@ export default function useCheckout() {
         method: paymentMethod,
         codSurcharge: codSurcharge
       },
-      orderedItems: selectedItems.map(item => item._id),
+      orderedItems: selectedItems.map(item => ({
+        product: item._id,
+        qty: item.quantity
+
+      }))
+      ,
       pricing: {
         subtotal,
         deliveryFee,
@@ -320,6 +325,7 @@ export default function useCheckout() {
         total
       }
     };
+    console.log("Var orderedItems", selectedItems)
 
 
     // Call Server action to confirm order:
@@ -342,7 +348,7 @@ export default function useCheckout() {
     clearCart();
 
     setIsProcessing(false);
-    return true; 
+    return true;
 
 
 
@@ -357,7 +363,7 @@ export default function useCheckout() {
     setLocationError("")
   }
 
-  
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {

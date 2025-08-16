@@ -15,7 +15,7 @@ const GetAllOrders = unstable_cache(
         try {
 
             await ConnectDB();
-            const allOrders = await Orders.find().populate("orderedItems").lean();
+            const allOrders = await Orders.find().populate("orderedItems.product").lean();
 
             
             return JSON.parse(JSON.stringify(allOrders));
