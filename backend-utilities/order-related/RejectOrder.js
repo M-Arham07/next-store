@@ -4,6 +4,7 @@ import { revalidateTag } from "next/cache";
 import ConnectDB from "../ConnectDB";
 import Orders from "@/backend-utilities/models/OrdersModel";
 import Products from "@/backend-utilities/models/ProductModel";
+import UpdateAvailableUnitsAfterOrder from "../UpdateAvailableUnitsAfterOrder";
 
 export default async function RejectOrder(orderId, cancelReason, cancelledBy = "user") {
 
@@ -13,9 +14,9 @@ export default async function RejectOrder(orderId, cancelReason, cancelledBy = "
         await ConnectDB();
 
         const order = await Orders.findOne({ orderId: orderId }).populate("orderedItems");
-        console.log("Found",order)
 
-        const SUPPORTED_CANCEL_STATUSES = ["processing","confirmed"]
+
+        const SUPPORTED_CANCEL_STATUSES = ["processing", "confirmed"]
 
         /* ADMIN CAN CANCEL ORDER AT ANY STEP, USER CAN ONLY CANCEL IF ORDER STATUS
             IS PROCESSING OR CONFIRMED! */
@@ -23,6 +24,7 @@ export default async function RejectOrder(orderId, cancelReason, cancelledBy = "
             throw new Error("User cannot cancel order at this stage!");
 
         }
+       
 
         await Orders.findOneAndUpdate(
             { orderId: orderId },
@@ -39,7 +41,10 @@ export default async function RejectOrder(orderId, cancelReason, cancelledBy = "
 
         // RE-INCREMENT PRODUCT QUANTITY:
 
-        
+
+
+        await UpdateAvailableUnitsAfterOrder(true, order.orderedItems);
+
 
 
         // Revalidate tag to refresh cache!

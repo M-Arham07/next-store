@@ -14,6 +14,8 @@ import Products from "@/backend-utilities/models/ProductModel";
 
 export default async function UpdateAvailableUnitsAfterOrder(increment, orderedItems) {
 
+  console.log("REceived ordered items",orderedItems)
+
   // if increment is false, it means product is ordered, if its true, it means product is cancelled
 
   try {
@@ -23,7 +25,7 @@ export default async function UpdateAvailableUnitsAfterOrder(increment, orderedI
 
     /* To avoid sending individual calls for every single item, we will use bulk write
      to make an array of the operations, and then bulk perform them (bulk update qty) at once */
-
+     
     const bulkOperations = orderedItems.map(item => ({
       updateOne: {
         filter: { _id: item.product },
@@ -32,7 +34,7 @@ export default async function UpdateAvailableUnitsAfterOrder(increment, orderedI
     }));
 
 
-    console.log('PERFORMING BULK OPERATION:',JSON.stringify(bulkOperations))
+    // console.log('PERFORMING BULK OPERATION:',JSON.stringify(bulkOperations))
 
     const updatedInfo = await Products.bulkWrite(bulkOperations);
 
@@ -52,7 +54,7 @@ export default async function UpdateAvailableUnitsAfterOrder(increment, orderedI
     console.error(`
       Error while updating available products at UpdateAvailableUnitsAfterOrder! Logs:",${err?.message}
       `);
-     throw err;
+     throw new Error(err.message);
   }
 
 }
