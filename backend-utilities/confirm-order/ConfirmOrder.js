@@ -5,7 +5,8 @@ import Orders from "@/backend-utilities/models/OrdersModel";
 import VerifyPromoCode from "@/backend-utilities/promo-related/VerifyPromo";
 import DecLeftUses from "@/backend-utilities/promo-related/DecLeftUses";
 import { revalidateTag } from "next/cache";
-
+import Products from "@/backend-utilities/models/ProductModel";
+import UpdateAvailableUnitsAfterOrder from "../UpdateAvailableUnitsAfterOrder";
 export default async function ConfirmOrder(orderDetails) {
 
     // console.log("receievd order details:",{orderId,...orderDetails});
@@ -59,7 +60,15 @@ export default async function ConfirmOrder(orderDetails) {
          throw an error! */
 
 
+         // VERIFY PRODUCT QUANTITY (later):
+
+         
+
+
         await Orders.create({ orderId, ...orderDetails, status: 'processing' });
+
+        await UpdateAvailableUnitsAfterOrder(false,orderDetails.orderedItems);
+
 
         // Refresh cache for orders!
         revalidateTag('orders');
