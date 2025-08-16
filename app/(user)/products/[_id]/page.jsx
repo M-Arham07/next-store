@@ -1,6 +1,6 @@
 import ProductInfoPage from "@/components/productinfo-page/product-info";
 import UnavailableProduct from "@/components/productinfo-page/unavailable-product";
-import GetProductById from "@/backend-utilities/GetProductById";
+import GetProductById from "@/backend-utilities/getProductById";
 
 
 
