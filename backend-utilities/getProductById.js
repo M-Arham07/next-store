@@ -5,7 +5,7 @@ import mongoose, { Mongoose } from "mongoose";
 import Products from "@/backend-utilities/models/ProductModel";
 
 
-export default async function getProductById(_id) {
+export default async function GetProductById(_id) {
 
 
     try {

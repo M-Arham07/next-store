@@ -1,6 +1,11 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 export default async function ConnectDB() {
+
+
+    if(mongoose.connection.readyState === 1) return;
+
+    if(mongoose.connection.readyState === 2) return;
 
     try {
         await mongoose.connect(process.env.DB_URI);
