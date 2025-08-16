@@ -31,7 +31,7 @@ import {
 
 import AlertNotification from "@/components/AlertNotification";
 import UpdateStatusDialog from "@/components/admin/adminorderpage/UpdateStatusDialog";
-import RejectOrderDialog from "@/components/admin/adminorderpage/RejectOrderDialog";
+import RejectOrderDialog from "@/components/RejectOrderDialog";
 import { OrderManagerContext } from "@/contexts/OrderManagerProvider";
 import ActionErrorDialog from "@/components/admin/adminorderpage/ActionErrorDialog";
 import ViewShippingDialog from "@/components/admin/adminorderpage/ViewShippingDialog";
@@ -193,7 +193,9 @@ export default function AdminOrderOverview({ currentOrder }) {
                   <div className="flex items-center gap-2 justify-center w-full">
                     <XCircle className="w-8 h-8 text-red-600 drop-shadow-lg" />
                     <span className="text-lg sm:text-xl font-semibold text-red-900 dark:text-red-200 tracking-wide text-center">
-                      This order was rejected on:
+                      This order was 
+                      {currentOrder?.cancelledBy === "user" ? " cancelled " : " rejected "}
+                      on:
                     </span>
                   </div>
 
@@ -452,7 +454,7 @@ export default function AdminOrderOverview({ currentOrder }) {
               {/* Status Update Confirmation Dialog */}
               <UpdateStatusDialog />
               {/* Delete Confirmation Dialog */}
-              <RejectOrderDialog />
+              <RejectOrderDialog canceller="admin"/>
 
               {/* Error Dialog */}
               <ActionErrorDialog />

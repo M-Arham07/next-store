@@ -1,26 +1,45 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import { Calendar, Truck, CheckCircle, Inbox, Phone, CreditCard, MapPin } from "lucide-react";
+import { useContext, useEffect, useState } from "react";
+import { Calendar, Truck, CheckCircle, Inbox, Phone, CreditCard, MapPin, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import CancelReasonDialog from "@/components/admin/adminorderpage/CancelReasonDialog";
+import RejectOrderDialog from "@/components/RejectOrderDialog";
+import AlertNotification from "@/components/AlertNotification";
+import { OrderManagerContext } from "@/contexts/OrderManagerProvider";
 
 export default function TrackOrder({ currentOrder }) {
+    const [showCancelReason, setShowCancelReason] = useState(false);
+
+    const { showNotification, setDeleteDialogOpen, setCurrentOrder } = useContext(OrderManagerContext);
+
+    useEffect(() => {
+        console.log("current order", currentOrder)
+        setCurrentOrder(currentOrder)
+    }, [currentOrder])
+
+
+
+
     // Supported steps
     const statusSteps = [
         "processing",
         "confirmed",
         "shipped",
         "out for delivery",
-        "delivered"
+        "delivered",
+        "cancelled"
     ];
+
     const statusLabels = {
         processing: "Processing",
         confirmed: "Order Confirmed",
         shipped: "Shipped",
         "out for delivery": "Out for Delivery",
-        delivered: "Delivered"
+        delivered: "Delivered",
+        cancelled: "Cancelled"
     };
 
     // Find current step index based on status (case-insensitive)
@@ -43,6 +62,7 @@ export default function TrackOrder({ currentOrder }) {
         shipped: { dotBg: "bg-emerald-500", dotText: "text-white", ring: "ring-emerald-400/30", label: "text-emerald-600", pillBg: "bg-emerald-50 text-emerald-700" },
         "out for delivery": { dotBg: "bg-emerald-500", dotText: "text-white", ring: "ring-emerald-400/30", label: "text-emerald-600", pillBg: "bg-emerald-50 text-emerald-700" },
         delivered: { dotBg: "bg-emerald-500", dotText: "text-white", ring: "ring-emerald-400/30", label: "text-emerald-600", pillBg: "bg-emerald-50 text-emerald-700" },
+        cancelled: { dotBg: "bg-red-500", dotText: "text-white", ring: "ring-red-400/30", label: "text-red-600", pillBg: "bg-red-50 text-red-700" },
     };
 
     // Payment method mapping
@@ -82,8 +102,29 @@ export default function TrackOrder({ currentOrder }) {
     const createdDate = new Date(currentOrder.createdAt);
     const estimatedDate = new Date(createdDate);
     estimatedDate.setDate(createdDate.getDate() + 5);
-    const estimatedDateStr = estimatedDate.toLocaleDateString("en-GB");
-    const createdDateStr = createdDate.toLocaleDateString("en-GB");
+    const cancelledDate = currentOrder.cancelledAt ? new Date(currentOrder.cancelledAt) : null;
+
+    const formatDate = (date) => {
+        return date.toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
+    };
+
+    const formatDateWithTime = (date) => {
+        return date.toLocaleString('en-US', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const estimatedDateStr = formatDate(estimatedDate);
+    const createdDateStr = formatDateWithTime(createdDate);
+    const cancelledDateStr = cancelledDate ? formatDateWithTime(cancelledDate) : null;
 
     // Pricing
     const subtotal = currentOrder.pricing?.subtotal || 0;
@@ -96,6 +137,40 @@ export default function TrackOrder({ currentOrder }) {
     return (
         <main className="min-h-screen p-4 md:p-8 bg-background text-foreground">
             <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Status Banners */}
+                {currentOrder.status === "cancelled" ? (
+                    <div className="md:col-span-3 rounded-2xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950 p-4">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900 flex items-center justify-center">
+                                    <XCircle className="text-red-600" size={24} />
+                                </div>
+                                <span className="text-lg md:text-xl font-medium text-red-600">
+                                    Your order was cancelled
+                                </span>
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="lg"
+                                onClick={() => setShowCancelReason(true)}
+                                className="text-red-600 border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900"
+                            >
+                                See Why
+                            </Button>
+                        </div>
+                    </div>
+                ) : currentOrder.status === "delivered" && (
+                    <div className="md:col-span-3 rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950 p-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center">
+                                <CheckCircle className="text-emerald-600" size={24} />
+                            </div>
+                            <span className="text-lg md:text-xl font-medium text-emerald-600">
+                                Your order was delivered
+                            </span>
+                        </div>
+                    </div>
+                )}
 
                 {/* LEFT MAIN */}
                 <div className="md:col-span-2 space-y-6 order-1 md:order-1">
@@ -108,7 +183,12 @@ export default function TrackOrder({ currentOrder }) {
                                     Order date: {createdDateStr}
                                 </p>
                                 <div className="flex items-center justify-between">
-                                    <p className="text-xs md:text-sm font-medium text-emerald-600 dark:text-emerald-400 mt-1">
+                                    <p className={cn(
+                                        "text-xs md:text-sm font-medium mt-1",
+                                        currentOrder.status === "cancelled"
+                                            ? "text-red-600 dark:text-red-500"
+                                            : "text-emerald-600 dark:text-emerald-400"
+                                    )}>
                                         Status: {statusLabels[currentOrder.status] || currentOrder.status}
                                     </p>
                                     {currentOrder.status?.toLowerCase() === "delivered" && (
@@ -117,8 +197,15 @@ export default function TrackOrder({ currentOrder }) {
                                         </span>
                                     )}
                                 </div>
-                                <p className="text-xs md:text-sm font-medium text-emerald-600 dark:text-emerald-400 mt-1">
-                                    Estimated: {estimatedDateStr}
+                                <p className="text-xs md:text-sm font-medium mt-1">
+                                    {currentOrder.status === "cancelled"
+                                        ? <span className="text-red-600 dark:text-red-500">Cancelled at: {cancelledDateStr}</span>
+                                        : <span className="text-emerald-600 dark:text-emerald-400">
+                                            {currentOrder.status === "delivered" ?
+                                                `Delivered at ${formatDateWithTime(new Date(currentOrder.deliveredAt))}`
+                                                : `Estimated Delivery: ${estimatedDateStr}`}
+                                        </span>
+                                    }
                                 </p>
                             </div>
                         </div>
@@ -126,7 +213,7 @@ export default function TrackOrder({ currentOrder }) {
 
 
                     {/* Progress */}
-                    <div className="relative overflow-hidden rounded-2xl border border-border">
+                    {currentOrder?.status !== "cancelled" && (<div className="relative overflow-hidden rounded-2xl border border-border">
                         <div className="p-6">
                             <h2 className="text-base font-semibold mb-4">Order Progress</h2>
                             <ul className="flex flex-col space-y-5">
@@ -173,7 +260,7 @@ export default function TrackOrder({ currentOrder }) {
                                 })}
                             </ul>
                         </div>
-                    </div>
+                    </div>)}
 
                     {/* Items */}
                     <div className="relative overflow-hidden rounded-2xl border border-border">
@@ -192,7 +279,7 @@ export default function TrackOrder({ currentOrder }) {
                                             </div>
                                             <div className="text-right">
                                                 <div className="font-medium">${it.price.toFixed(2)}</div>
-                                                {/* No qty field in object */}
+                                                <div className="text-xs text-muted-foreground">Qty: {it.quantity || 1}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -255,7 +342,7 @@ export default function TrackOrder({ currentOrder }) {
                                 <div className="flex justify-between"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
                                 {discountAmount > 0 && <div className="flex justify-between"><span className="text-green-600 dark:text-green-500">Discount</span><span className="text-green-600  dark:text-green-500">-${discountAmount.toFixed(2)}</span></div>}
                                 <div className="flex justify-between"><span>Delivery</span><span>${deliveryFee.toFixed(2)}</span></div>
-                             { codSurcharge > 0 &&  <div className="flex justify-between"><span className="text-yellow-600 dark:text-yellow-400">COD Surcharge</span><span  className="text-yellow-600 dark:text-yellow-400">+${codSurcharge.toFixed(2)}</span></div> }
+                                {codSurcharge > 0 && <div className="flex justify-between"><span className="text-yellow-600 dark:text-yellow-400">COD Surcharge</span><span className="text-yellow-600 dark:text-yellow-400">+${codSurcharge.toFixed(2)}</span></div>}
                                 {/* Tax not provided */}
                                 <hr className="my-2" />
                                 <div className="flex justify-between font-semibold text-lg"><span>Total</span><span>${total.toFixed(2)}</span></div>
@@ -282,9 +369,47 @@ export default function TrackOrder({ currentOrder }) {
                         </div>
                     </div>
 
+                    {/* Cancel Order */}
+                    {["processing","confirmed"].includes(currentOrder.status) && 
+
+                    (<div className="order-4 md:order-4">
+                        <div className="relative overflow-hidden rounded-2xl border border-border p-6">
+                            <h3 className="text-base md:text-lg font-semibold mb-3">Changed your mind?</h3>
+                            <Button
+                                variant="destructive"
+                                className="w-full"
+                                onClick={() => setDeleteDialogOpen(true)}
+                            >
+                                Cancel Order
+                            </Button>
+                        </div>
+                    </div>)}
+
                 </aside>
             </div>
+
+            {/* Cancel Reason Dialog */}
+            <CancelReasonDialog
+                open={showCancelReason}
+                onOpenChange={setShowCancelReason}
+                cancelDetails={{
+                    cancelledAt: currentOrder.cancelledAt,
+                    cancelledBy: currentOrder.cancelledBy === "user" ? "You" : "Admin",
+                    reason: currentOrder.cancelReason
+                }}
+            />
+
+
+            <RejectOrderDialog canceller="user" />
+
+
+            {showNotification && <AlertNotification
+                message="Your order was cancelled successfully"
+                linkName="Shop More"
+                linkHref="/products"
+            />
+            }
+
         </main>
     );
 }
-

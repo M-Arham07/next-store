@@ -13,7 +13,7 @@ import DateRangeFilter from "@/components/DateRangeFilter";
 import Link from "next/link";
 import { OrderManagerContext } from "@/contexts/OrderManagerProvider";
 import UpdateStatusDialog from "@/components/admin/adminorderpage/UpdateStatusDialog";
-import RejectOrderDialog from "@/components/admin/adminorderpage/RejectOrderDialog";
+import RejectOrderDialog from "@/components/RejectOrderDialog";
 import { useRouter } from "next/navigation";
 import CancelReasonDialog from "./CancelReasonDialog";
 import AlertNotification from "@/components/AlertNotification";
@@ -266,7 +266,7 @@ export default function ManageOrdersPage({ allOrders = [] }) {
       its trasnmitted to all these dialogs so they're easily opened by the state as its a shared one!
        */}
       <UpdateStatusDialog />
-      <RejectOrderDialog />
+      <RejectOrderDialog canceller="admin" />
 
 
       {/* Im not using internal state for this component cuz i also have to use

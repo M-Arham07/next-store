@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import RejectOrder from "@/backend-utilities/order-related/RejectOrder";
 import UpdateOrderStatus from "@/backend-utilities/order-related/UpdateOrderStatus";
-import UpdateStatusDialog from "@/components/admin/adminorderpage/UpdateStatusDialog";
+
 
 
 
@@ -88,13 +88,13 @@ export default function useOrderManager() {
 
 
 
-    const handleRejectOrder = async () => {
+    const handleRejectOrder = async (canceller) => {
         if (!cancelReasonError && cancelReason.length >= 10) {
             setRejectLoading(true);
 
             //set Cancelled by to admin:
 
-            const isRejected = await RejectOrder(currentOrder.orderId, cancelReason, "admin");
+            const isRejected = await RejectOrder(currentOrder.orderId, cancelReason, canceller);
             setRejectLoading(false);
             if (isRejected) {
                 setCurrentOrder((prev) => ({ ...prev, status: "cancelled" }))

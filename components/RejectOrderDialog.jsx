@@ -6,7 +6,7 @@ import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 
 
 
-export default function RejectOrderDialog() {
+export default function RejectOrderDialog({ canceller = "user" }) {
 
     const {
         deleteDialogOpen,
@@ -27,7 +27,9 @@ export default function RejectOrderDialog() {
             description={
                 <>
                     <span>
-                        Are you sure you want to reject this order? This action cannot be undone.
+                        Are you sure you want to
+                        {canceller === "user" ? " cancel " : " reject "}
+                        this order? This action cannot be undone.
                     </span>
                     <div className="mt-4">
                         <label className="block text-sm font-medium text-black dark:text-white mb-1">
@@ -47,7 +49,7 @@ export default function RejectOrderDialog() {
                 </>
             }
             actionName={rejectLoading ? "Rejecting..." : "Reject"}
-            onConfirm={handleRejectOrder}
+            onConfirm={() => handleRejectOrder(canceller)}
             actionDisabled={!!cancelReasonError || cancelReason.length < 10 || rejectLoading}
         />
 

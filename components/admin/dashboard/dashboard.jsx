@@ -14,9 +14,7 @@ import Link from "next/link"
 
 export default function AdminDashboard({
   adminName = "",
-  STATS: { TOTAL_USERS, TOTAL_PRODUCTS, ProdChange }
-
-
+  STATS: { TOTAL_USERS, TOTAL_PRODUCTS, ProdChange, TOTAL_ORDERS, OrderChange }
 }) {
 
 
@@ -42,9 +40,9 @@ export default function AdminDashboard({
     {
       title: "Total Orders",
       cardHref: "/admin/orders",
-      value: "12,234",
-      change: "+19%",
-      changeType: "increase",
+      value: TOTAL_ORDERS,
+      change: `${OrderChange > 0 ? '+' : ''}${OrderChange}%`,
+      changeType: OrderChange >= 0 ? "increase" : "decrease",
       icon: ShoppingCart,
       description: "from last month",
     },
@@ -104,9 +102,9 @@ export default function AdminDashboard({
       <div className="flex items-center justify-between space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Welcome {adminName.split(" ")[1]} !</h2>
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm">
+          {/* <Button variant="outline" size="sm">
             Download Report
-          </Button>
+          </Button> */}
         </div>
       </div>
 
@@ -332,3 +330,4 @@ export default function AdminDashboard({
     </div>
   )
 }
+ 

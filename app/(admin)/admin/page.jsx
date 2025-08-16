@@ -1,12 +1,9 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import AdminDashboard from "@/components/admin/dashboard/dashboard";
 import { getServerSession } from "next-auth";
-import ConnectDB from "@/backend-utilities/ConnectDB";
-import Users from "@/backend-utilities/models/UserModel";
-import Products from "@/backend-utilities/models/ProductModel";
-import { unstable_cache } from "next/cache";
 import GetProducts from "@/backend-utilities/GetProducts";
 import GetAllUsers from "@/backend-utilities/GetAllUsers";
+import GetAllOrders from "@/backend-utilities/GetAllOrders";
 
 
 
@@ -18,10 +15,11 @@ export default async function ADMIN_DASHBOARD() {
  
     const session = await getServerSession(authOptions);
 
-    // BOTH ARE CACHED FUNCTIONS :
+    // THESE ALL ARE CACHED FUNCTIONS :
 
     const allUsers = await GetAllUsers();
     const allProducts = await GetProducts();
+    const allOrders = await GetAllOrders();
     
     
 
@@ -59,11 +57,35 @@ export default async function ADMIN_DASHBOARD() {
     // ProdChange==  (products added this month) - (products added in last month )
   
 
-    const STATS = {
+    
+    // Calculate orders this month and last month
+    const ordersThisMonth = allOrders.filter(order => {
+        const orderDate = new Date(order.createdAt);
+        return (
+            orderDate.getMonth() === now.getMonth() &&
+            orderDate.getFullYear() === now.getFullYear()
+        )
+    });
 
-        TOTAL_USERS : allUsers.length ?? "No Data. Please reload the page",
-        TOTAL_PRODUCTS : allProducts.length ?? "No Data. Please reload the page",
-        ProdChange :productsAddedThisMonth.length - productsAddedLastMonth.length
+    const ordersLastMonth = allOrders.filter(order => {
+        const orderDate = new Date(order.createdAt);
+        return (
+            orderDate.getMonth() === lastMonth.getMonth() &&
+            orderDate.getFullYear() === lastMonth.getFullYear()
+        )
+    });
+
+    // Calculate percentage change
+    const orderChange = ordersLastMonth.length > 0 
+        ? (((ordersThisMonth.length - ordersLastMonth.length) / ordersLastMonth.length) * 100).toFixed(1)
+        : "100";
+
+    const STATS = {
+        TOTAL_USERS: allUsers.length ?? "No Data. Please reload the page",
+        TOTAL_PRODUCTS: allProducts.length ?? "No Data. Please reload the page",
+        ProdChange: productsAddedThisMonth.length - productsAddedLastMonth.length,
+        TOTAL_ORDERS: allOrders.length,
+        OrderChange: orderChange // Add this
     }
 
 

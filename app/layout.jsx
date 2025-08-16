@@ -5,6 +5,7 @@ import { resolve } from "styled-jsx/css";
 import { CartProvider } from "@/contexts/CartProvider";
 import AUTH_SESSION_PROVIDER from "@/contexts/NextAuthProvider";
 import { EdgeStoreProvider } from "@/contexts/EdgeStoreProvider";
+import OrderManagerProvider from "@/contexts/OrderManagerProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,9 +37,11 @@ export default async function RootLayout({ children }) {
       <body className="antialiased">
         <AUTH_SESSION_PROVIDER>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <OrderManagerProvider>
             <CartProvider>
               <main>{children}</main>
             </CartProvider>
+            </OrderManagerProvider>
           </ThemeProvider>
     
         </AUTH_SESSION_PROVIDER>
