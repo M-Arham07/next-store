@@ -398,7 +398,7 @@ export default function AdminOrderOverview({ currentOrder }) {
                   <div>
                     <h2 className="text-2xl sm:text-3xl font-bold">Ordered Items</h2>
                     <p className="text-sm sm:text-base text-slate-500 dark:text-slate-400">
-                      {currentOrder?.orderedItems?.length || 0} products
+                      {currentOrder?.orderedItems?.reduce((total, item) => total + item.qty, 0) || 0} items in total
                     </p>
                   </div>
                 </CardHeader>
@@ -417,24 +417,24 @@ export default function AdminOrderOverview({ currentOrder }) {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {currentOrder?.orderedItems?.map((it) => (
-                          <TableRow key={it._id}>
+                        {currentOrder?.orderedItems?.map((item) => (
+                          <TableRow key={item._id}>
                             <TableCell>
                               <div className="w-16 h-16 rounded-lg overflow-hidden relative flex-shrink-0">
                                 <Image
-                                  src={it.images?.[0] || ""}
-                                  alt={it.title}
+                                  src={item.product.images?.[0] || ""}
+                                  alt={item.product.title}
                                   width={64}
                                   height={64}
                                   className="object-cover"
                                 />
                               </div>
                             </TableCell>
-                            <TableCell className="font-medium">{it.title}</TableCell>
-                            <TableCell>1</TableCell>
-                            <TableCell>${it.price.toFixed(2)}</TableCell>
+                            <TableCell className="font-medium">{item.product.title}</TableCell>
+                            <TableCell>{item.qty}</TableCell>
+                            <TableCell>${item.product.price.toFixed(2)}</TableCell>
                             <TableCell className="font-semibold">
-                              ${it.price.toFixed(2)}
+                              ${(item.product.price * item.qty).toFixed(2)}
                             </TableCell>
                           </TableRow>
                         ))}

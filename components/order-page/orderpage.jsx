@@ -30,6 +30,7 @@ import DateRangeFilter from "@/components/DateRangeFilter";
 
 
 export default function YourOrdersPage({ orders = [] }) {
+    
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [dateRange, setDateRange] = useState({
@@ -39,7 +40,7 @@ export default function YourOrdersPage({ orders = [] }) {
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch = order.orderId.includes(searchTerm) || order.orderedItems.some((item) =>
-      item?.title?.toLowerCase().includes(searchTerm.toLowerCase())
+      item?.product?.title?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     const matchesStatus =
       statusFilter === "All"
@@ -140,8 +141,8 @@ export default function YourOrdersPage({ orders = [] }) {
                 {/* Product Image */}
                 <div className="flex-shrink-0">
                   <Image
-                    src={order.orderedItems[0].images[0]}
-                    alt={order.orderedItems[0].title}
+                    src={order.orderedItems[0].product.images[0]}
+                    alt={order.orderedItems[0].product.title}
                     width={120}
                     height={120}
                     className="rounded-md object-cover w-full h-[200px] sm:w-[150px] sm:h-[150px]"
@@ -152,7 +153,7 @@ export default function YourOrdersPage({ orders = [] }) {
                 <div className="flex-1 min-w-0">
                   {/* Title */}
                   <p className="font-medium text-lg truncate">
-                    {order.orderedItems[0].title}
+                    {order.orderedItems[0].product.title}
                     {order.orderedItems.length > 1 && (
                       <span className="text-muted-foreground">
                         {" "}+ {order.orderedItems.length - 1} more
@@ -165,10 +166,9 @@ export default function YourOrdersPage({ orders = [] }) {
                     <p className="text-sm font-medium text-foreground">
                       Total: ${order.pricing.total.toFixed(2)}
                     </p>
-                      <Button variant="ghost" className="text-sm">
-                        View <span className="ml-1">→</span>
-                      </Button>
-                   
+                    <Button variant="ghost" className="text-sm">
+                      View <span className="ml-1">→</span>
+                    </Button>
                   </div>
 
                   {/* Order ID + Date */}
@@ -194,3 +194,4 @@ export default function YourOrdersPage({ orders = [] }) {
     </div>
   );
 }
+        

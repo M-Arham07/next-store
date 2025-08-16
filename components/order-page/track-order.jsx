@@ -11,6 +11,8 @@ import AlertNotification from "@/components/AlertNotification";
 import { OrderManagerContext } from "@/contexts/OrderManagerProvider";
 
 export default function TrackOrder({ currentOrder }) {
+    
+
     const [showCancelReason, setShowCancelReason] = useState(false);
 
     const { showNotification, setDeleteDialogOpen, setCurrentOrder } = useContext(OrderManagerContext);
@@ -265,21 +267,30 @@ export default function TrackOrder({ currentOrder }) {
                     {/* Items */}
                     <div className="relative overflow-hidden rounded-2xl border border-border">
                         <div className="p-6">
-                            <h2 className="text-base font-semibold mb-6">Items</h2>
+                            <h2 className="text-xl md:text-2xl font-semibold mb-2">Items</h2>
+                            <p className="text-sm text-muted-foreground mb-6">
+                                {currentOrder.orderedItems.reduce((total, item) => total + item.qty, 0)} products in total
+                            </p>
                             <div className="space-y-6">
-                                {currentOrder.orderedItems.map((it) => (
-                                    <div key={it._id} className="flex items-center gap-4">
+                                {currentOrder.orderedItems.map((item) => (
+                                    <div key={item._id} className="flex items-center gap-4">
                                         <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
-                                            <Image src={it.images?.[0] || "/images/placeholder-device.jpg"} alt={it.title} width={64} height={64} className="object-cover h-full w-full" />
+                                            <Image 
+                                                src={item.product.images?.[0] || "/images/placeholder-device.jpg"} 
+                                                alt={item.product.title} 
+                                                width={64} 
+                                                height={64} 
+                                                className="object-cover h-full w-full" 
+                                            />
                                         </div>
                                         <div className="flex-1 flex justify-between">
                                             <div>
-                                                <div className="font-medium">{it.title}</div>
-                                                <div className="text-xs text-muted-foreground">{it.category}</div>
+                                                <div className="font-medium">{item.product.title}</div>
+                                                <div className="text-xs text-muted-foreground">{item.product.category}</div>
                                             </div>
                                             <div className="text-right">
-                                                <div className="font-medium">${it.price.toFixed(2)}</div>
-                                                <div className="text-xs text-muted-foreground">Qty: {it.quantity || 1}</div>
+                                                <div className="font-medium">${item.product.price.toFixed(2)}</div>
+                                                <div className="text-xs text-muted-foreground">Qty: {item.qty}</div>
                                             </div>
                                         </div>
                                     </div>

@@ -208,7 +208,9 @@ export default function ManageOrdersPage({ allOrders = [] }) {
                     </TableCell>
                     <TableCell className="py-4">{getStatusBadge(order.status)}</TableCell>
                     <TableCell className="font-medium py-4">${order.pricing.total.toFixed(2)}</TableCell>
-                    <TableCell className="text-sm py-4">{order.orderedItems.length}</TableCell>
+                    <TableCell className="text-sm py-4">
+                      {order.orderedItems.reduce((total, item) => total + item.qty, 0)}
+                    </TableCell>
                     <TableCell className="text-sm py-4">
                       {formattedDates[order._id] || ''}
                     </TableCell>
